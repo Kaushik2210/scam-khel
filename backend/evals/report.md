@@ -1,6 +1,6 @@
 # Eval report
 
-Generated 2026-10-17T07:42:02+00:00 · mode: **offline (rules + scripted fallbacks, no LLM)**
+Generated 2026-10-17T07:51:46+00:00 · mode: **offline (rules + scripted fallbacks, no LLM)**
 
 | Metric | Result |
 |---|---|
@@ -17,6 +17,8 @@ Generated 2026-10-17T07:42:02+00:00 · mode: **offline (rules + scripted fallbac
 | Run mode | offline (rules + scripted fallbacks, no LLM) |
 
 > The *tuned* set (dialogues_p1.yaml) was used while writing the rules, so its numbers are optimistic. The *held-out* set was written afterwards; trust that one more.
+>
+> Disclosure: on its first run the held-out set had one false positive (a public scam-awareness advisory; held-out F1 0.917, FP rate 0.111). An awareness-context dampener was added afterwards, so the held-out numbers here are post-fix and no longer purely held-out. The late scams listed below were left as known limitations: the rules-only detector is weakest on paraphrase (the Nemotron tagger is meant to cover that; run `make eval-live` to measure it).
 
 ## Detection by set
 | set | n | P | R | F1 | FP rate |
