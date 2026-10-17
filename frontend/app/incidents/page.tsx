@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Notice, Spinner, Empty } from "@/components/Panels";
+import { Notice, Skeleton, Empty } from "@/components/Panels";
 import { useI18n } from "@/lib/i18n";
 import { useFetch } from "@/lib/useFetch";
 
@@ -22,7 +22,7 @@ export default function Incidents() {
   return (
     <div className="space-y-4">
       <h1 className="text-title1">{t("incidents.title")}</h1>
-      {loading && <Spinner label={t("common.loading")} />}
+      {loading && <Skeleton rows={3} />}
       {error && (
         <Notice tone="error">
           {error}{" "}

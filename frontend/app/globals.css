@@ -137,3 +137,46 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+
+/* ---- polish layer ---- */
+body {
+  background-image: radial-gradient(900px 380px at 50% -120px, color-mix(in srgb, var(--tint) 16%, transparent), transparent 70%);
+  background-repeat: no-repeat;
+}
+.card {
+  border: 1px solid color-mix(in srgb, var(--separator) 55%, transparent);
+}
+.btn {
+  transition: transform 0.08s ease-out, opacity 0.15s;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.92;
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface), var(--raised), var(--surface));
+  background-size: 200% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gauge-fill {
+    transition: stroke-dashoffset 0.6s ease-out, stroke 0.3s ease-out;
+  }
+  .skeleton {
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer {
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+.link-quiet {
+  color: var(--label-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.link-quiet:hover {
+  color: var(--label);
+}

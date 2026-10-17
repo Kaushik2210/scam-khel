@@ -12,6 +12,7 @@ import {
   RiskMeter,
   SimBanner,
   Spinner,
+  StatusPill,
   TacticTimeline,
   Transcript,
   VerificationPanel,
@@ -19,10 +20,10 @@ import {
 } from "@/components/Panels";
 import { download } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
-import { canSpeak, speak, stopSpeaking } from "@/lib/voice";
 import type { Scenario } from "@/lib/types";
 import { useFetch } from "@/lib/useFetch";
 import { useSession } from "@/lib/useSession";
+import { canSpeak, speak, stopSpeaking } from "@/lib/voice";
 
 export default function Simulate() {
   const { t, lang } = useI18n();
@@ -40,7 +41,7 @@ export default function Simulate() {
   const lastPersona = [...state.transcript].reverse().find((l) => l.speaker === "persona");
   const spokenCount = state.transcript.filter((l) => l.speaker === "persona").length;
   useEffect(() => {
-    if (aloud && lastPersona) speak(lastPersona.text, "en");
+    if (aloud && lastPersona) speak(lastPersona.text, lang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spokenCount, aloud]);
   useEffect(() => (aloud ? undefined : void stopSpeaking()), [aloud]);
@@ -50,6 +51,7 @@ export default function Simulate() {
   }, [scen.data, scenario]);
 
   const busy = state.status === "connecting" || state.status === "running";
+  const picked = scen.data?.find((s) => s.id === scenario);
   const onStart = async () => {
     if (!(await requireConsent())) return;
     start({ mode: manual ? "manual" : "honeypot", scenario, language: lang, speed });
@@ -73,62 +75,65 @@ export default function Simulate() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-title1">{t("sim.title")}</h1>
+        <StatusPill status={state.status} />
       </div>
       <SimBanner />
 
-      <section className="card grid gap-4 md:grid-cols-[1fr_1fr_auto]" aria-label="Setup">
+      <section className="card grid gap-5 md:grid-cols-[1.2fr_1fr_auto] md:items-end" aria-label="Setup">
         <label className="block">
           <span className="mb-1 block text-subhead font-semibold">{t("sim.scenario")}</span>
-          <select
-            className="field"
-            value={scenario}
-            onChange={(e) => setScenario(e.target.value)}
-            disabled={busy}
-            data-testid="scenario"
-          >
+          <select className="field" value={scenario} onChange={(e) => setScenario(e.target.value)} disabled={busy} data-testid="scenario">
             {(scen.data ?? []).map((s) => (
               <option key={s.id} value={s.id}>
                 {s.title}
               </option>
             ))}
           </select>
+          {picked && <span className="mt-1 block text-footnote text-label3">{picked.agency}</span>}
           {scen.error && <span className="text-footnote text-danger">{scen.error}</span>}
         </label>
         <fieldset disabled={busy}>
           <legend className="mb-1 text-subhead font-semibold">{t("sim.mode")}</legend>
-          <div className="flex flex-col gap-1">
+          <div role="radiogroup" className="inline-flex rounded-ctl bg-raised p-1">
             {[
               [false, "sim.auto"],
               [true, "sim.manual"],
             ].map(([v, k]) => (
-              <label key={String(v)} className="flex min-h-tap items-center gap-2">
-                <input type="radio" name="who" checked={manual === v} onChange={() => setManual(v as boolean)} className="h-5 w-5 accent-[var(--tint)]" />
+              <label
+                key={String(v)}
+                className={`flex min-h-[40px] cursor-pointer items-center rounded-[9px] px-3 text-callout font-semibold ${
+                  manual === v ? "bg-surface text-label shadow" : "text-label2"
+                }`}
+              >
+                <input type="radio" name="who" className="sr-only" checked={manual === v} onChange={() => setManual(v as boolean)} />
                 {t(k as "sim.auto")}
               </label>
             ))}
           </div>
-          {canTalk && (
-            <label className="mt-1 flex min-h-tap items-center gap-2 text-callout">
-              <input type="checkbox" className="h-5 w-5 accent-[var(--tint)]" checked={aloud} onChange={(e) => setAloud(e.target.checked)} />
-              {t("voice.readAloud")}
-            </label>
-          )}
-          {!manual && (
-            <label className="mt-1 flex items-center gap-2 text-callout">
-              {t("sim.speed")}
-              <select className="field !w-auto" value={speed} onChange={(e) => setSpeed(+e.target.value)} aria-label={t("sim.speed")}>
-                {[1, 2, 4, 8].map((x) => (
-                  <option key={x} value={x}>
-                    {x}×
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {!manual && (
+              <label className="flex items-center gap-2 text-callout">
+                {t("sim.speed")}
+                <select className="field !w-auto !min-h-[40px]" value={speed} onChange={(e) => setSpeed(+e.target.value)} aria-label={t("sim.speed")}>
+                  {[1, 2, 4, 8].map((x) => (
+                    <option key={x} value={x}>
+                      {x}×
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {canTalk && (
+              <label className="flex min-h-tap items-center gap-2 text-callout">
+                <input type="checkbox" className="h-5 w-5 accent-[var(--tint)]" checked={aloud} onChange={(e) => setAloud(e.target.checked)} />
+                {t("voice.readAloud")}
+              </label>
+            )}
+          </div>
         </fieldset>
-        <div className="flex items-end gap-2">
+        <div className="flex gap-2">
           {!busy ? (
-            <button type="button" className="btn-primary" onClick={onStart} data-testid="start">
+            <button type="button" className="btn-primary !min-h-[52px] w-full md:w-auto" onClick={onStart} data-testid="start">
               <Icon name="play" /> {t("sim.start")}
             </button>
           ) : (
@@ -159,6 +164,12 @@ export default function Simulate() {
       {state.status === "connecting" && <Spinner label={t("state.connecting")} />}
 
       <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
+        {/* risk first on phones, right-hand column on desktop */}
+        <div className="order-first space-y-4 lg:order-last lg:sticky lg:top-4 lg:self-start">
+          <RiskMeter risk={state.risk} />
+          {!manual && <WastedCard seconds={state.timeWasted} turns={state.engaged} />}
+          <MemoryCard hit={state.memoryHit} />
+        </div>
         <div className="space-y-4">
           <Transcript lines={state.transcript} simulation thinking={busy} />
           {manual && busy && (
@@ -203,15 +214,13 @@ export default function Simulate() {
             </section>
           )}
         </div>
-        <div className="space-y-4">
-          <RiskMeter risk={state.risk} />
-          <MemoryCard hit={state.memoryHit} />
-          {!manual && <WastedCard seconds={state.timeWasted} turns={state.engaged} />}
-          <EvidencePanel items={state.evidence} />
-          <VerificationPanel items={state.verifications} />
-          <TacticTimeline points={state.timeline} />
-          <AlertsCard alerts={state.alerts} />
-        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <EvidencePanel items={state.evidence} />
+        <VerificationPanel items={state.verifications} />
+        <TacticTimeline points={state.timeline} />
+        <AlertsCard alerts={state.alerts} />
       </div>
     </div>
   );

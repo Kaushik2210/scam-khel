@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Empty, Notice, Spinner } from "@/components/Panels";
+import { Card, Empty, Notice, Skeleton } from "@/components/Panels";
 import { useI18n } from "@/lib/i18n";
 import { TACTICS, lab } from "@/lib/labels";
 import { useFetch } from "@/lib/useFetch";
@@ -46,7 +46,7 @@ export default function MemoryPage() {
     <div className="space-y-4">
       <h1 className="text-title1">{t("memory.title")}</h1>
       <p className="text-callout text-label2">{t("memory.sub")}</p>
-      {loading && <Spinner label={t("common.loading")} />}
+      {loading && <Skeleton rows={4} />}
       {error && <Notice tone="error">{error}</Notice>}
       <Card title={t("memory.learned")}>{learned.length ? list(learned) : <Empty>{t("incidents.empty")}</Empty>}</Card>
       <Card title={t("memory.builtin")}>{list(builtin)}</Card>

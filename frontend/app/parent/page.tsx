@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRequireConsent } from "@/components/Consent";
 import { MicButton } from "@/components/MicButton";
 import { Notice } from "@/components/Panels";
+import { EXAMPLES } from "@/lib/examples";
 import { api, ApiError } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 
@@ -108,7 +109,12 @@ export default function Parent() {
           maxLength={8000}
           data-testid="parent-text"
         />
-        <MicButton big onText={(x) => setText((p) => (p ? p + " " : "") + x)} />
+        <div className="flex flex-wrap gap-2">
+          <MicButton big onText={(x) => setText((p) => (p ? p + " " : "") + x)} />
+          <button type="button" className="btn-secondary !min-h-tapxl" onClick={() => setText(EXAMPLES[0].text[lang])}>
+            {t("live.examples")}
+          </button>
+        </div>
         <button type="button" className="btn-primary !min-h-tapxl w-full !text-[1.5rem]" onClick={check} disabled={busy || !text.trim()}>
           {busy ? t("common.loading") : t("parent.check")}
         </button>

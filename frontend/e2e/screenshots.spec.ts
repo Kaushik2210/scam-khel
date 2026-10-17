@@ -26,11 +26,13 @@ test("simulate", async ({ page }) => {
   await expect(page.getByTestId("risk-level")).toHaveAttribute("data-level", "critical", { timeout: 45_000 });
   await expect(page.getByRole("heading", { name: /simulation finished/i })).toBeVisible({ timeout: 60_000 });
   await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1000); // let the gauge animation settle
   await page.screenshot({ path: `${OUT}/03-simulate.png`, fullPage: true });
   // second run of a seen script -> memory banner
   await page.getByTestId("start").click();
   await expect(page.getByTestId("memory-hit")).toBeVisible({ timeout: 45_000 });
   await expect(page.getByRole("heading", { name: /simulation finished/i })).toBeVisible({ timeout: 60_000 });
+  await page.waitForTimeout(1000);
   await page.screenshot({ path: `${OUT}/04-memory-hit.png`, fullPage: true });
 });
 
@@ -44,6 +46,7 @@ test("shield and parent", async ({ page }) => {
   );
   await page.getByTestId("analyze").click();
   await expect(page.getByTestId("risk-level")).toHaveAttribute("data-level", "critical", { timeout: 20_000 });
+  await page.waitForTimeout(1000);
   await page.screenshot({ path: `${OUT}/05-shield.png`, fullPage: true });
 
   await page.setViewportSize({ width: 430, height: 900 });
@@ -51,6 +54,7 @@ test("shield and parent", async ({ page }) => {
   await page.getByTestId("parent-text").fill("You are under digital arrest. Transfer Rs 50,000 to the safe account now.");
   await page.getByRole("button", { name: /^check$/i }).click();
   await expect(page.getByTestId("parent-verdict")).toBeVisible();
+  await page.waitForTimeout(600);
   await page.screenshot({ path: `${OUT}/06-parent-mobile.png`, fullPage: true });
 });
 
