@@ -137,3 +137,21 @@ async def delete_user_data(db: AsyncSession, user_id: int) -> None:
             await db.execute(text("DELETE FROM script_fts WHERE script_id = :i"), {"i": s.id})
             await db.delete(s)
     await db.commit()
+
+
+async def add_family_member(
+    db: AsyncSession, user_id: int, label: str, role: str = "family"
+) -> FamilyMember:
+    import secrets
+
+    m = FamilyMember(
+        user_id=user_id, label=label[:32], role=role[:32], join_code=secrets.token_hex(4)
+    )
+    db.add(m)
+    await db.commit()
+    return m
+
+
+async def list_family(db: AsyncSession, user_id: int) -> list[FamilyMember]:
+    rows = await db.scalars(select(FamilyMember).where(FamilyMember.user_id == user_id))
+    return list(rows.all())
