@@ -19,6 +19,9 @@ class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     language: Mapped[str] = mapped_column(String(8), default="en")
+    client_key: Mapped[str | None] = mapped_column(
+        String(64), unique=True, index=True, default=None
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -100,6 +103,7 @@ class Incident(Base):
     )
     detect_turn: Mapped[int | None] = mapped_column(Integer, default=None)  # risk reached `high`
     memory_hit_turn: Mapped[int | None] = mapped_column(Integer, default=None)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # timeline, verifications...
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

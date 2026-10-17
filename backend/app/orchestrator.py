@@ -108,13 +108,14 @@ class Orchestrator:
         victim_provider: VictimProvider | None = None,
         stop: asyncio.Event | None = None,
         pace_s: float = 0.0,
+        session_id: str | None = None,
     ) -> SessionSummary:
         sc = load_scenario(scenario_id)
         sim = ScammerSim(sc, self.llm, self.seed)
         persona = Persona(self.llm, self.persona_config, self.seed)
         risk = RiskEngine()
         store = EvidenceStore()
-        sid = str(uuid.uuid4())
+        sid = session_id or str(uuid.uuid4())
         sm = SessionSummary(session_id=sid, scenario=scenario_id, mode=mode)
         history: list[tuple[str, str]] = []
         turn_tactics: list[list[str]] = []
@@ -226,7 +227,7 @@ class Orchestrator:
 
             new_items = await store.ingest(turn.text, n, self.llm)
             for rec in new_items:
-                await self.emit("evidence", rec.as_dict())
+                await self.emit("evidence", {"item": rec.as_dict()})
             await self._verify(sm, st.level, new_items, verified)
 
             if turn.done:
@@ -353,5 +354,13 @@ class Orchestrator:
             summary=f"{sm.scenario}: peak risk {sm.risk_peak}, {len(store.items())} identifiers",
             memory_hit_turn=(sm.memory_hit or {}).get("hit_turn"),
         )
+        inc.data = {
+            "scenario": sm.scenario,
+            "timeline": sm.timeline,
+            "verifications": sm.verifications,
+            "risk_peak": sm.risk_peak,
+            "time_wasted_s": sm.time_wasted_s,
+            "simulation": True,
+        }
         sm.incident_id = inc.id
         await self.db.commit()

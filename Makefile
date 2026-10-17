@@ -5,7 +5,7 @@ setup:
 	cd backend && $(PY) -m pip install -e ".[dev]"
 
 dev:
-	cd backend && $(PY) -m uvicorn app.main:app --reload --port 8000
+	cd backend && $(PY) -m uvicorn app.main:create_app --factory --reload --port 8000
 
 test:
 	cd backend && $(PY) -m pytest -q

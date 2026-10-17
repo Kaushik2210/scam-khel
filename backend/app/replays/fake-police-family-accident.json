@@ -1,0 +1,693 @@
+{
+ "scenario": "fake-police-family-accident",
+ "title": "Fake police - family member in an accident",
+ "source": "offline-scripted",
+ "summary": {
+  "risk_peak": 100,
+  "time_wasted_s": 373
+ },
+ "events": [
+  {
+   "type": "transcript",
+   "turn": 1,
+   "speaker": "scammer",
+   "text": "Main Inspector Kumar bol raha hoon, Local Police Desk (SIMULATION). Aapka beta accident mein pakda gaya hai aur custody mein hai.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 1,
+   "tactics": [
+    {
+     "id": "authority_impersonation",
+     "confidence": 0.9,
+     "evidence_span": "Inspector"
+    },
+    {
+     "id": "fear_arrest_threat",
+     "confidence": 0.9,
+     "evidence_span": "custody"
+    },
+    {
+     "id": "family_member_implicated",
+     "confidence": 0.9,
+     "evidence_span": "Aapka beta accident mein pakda gaya hai aur custody"
+    }
+   ],
+   "stage": "accusation",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 1,
+   "level": "caution",
+   "score": 64,
+   "summary": "कुछ खतरे के संकेत हैं। अभी कोई जानकारी या पैसे न दें।",
+   "tactics": [
+    "authority_impersonation",
+    "family_member_implicated",
+    "fear_arrest_threat"
+   ],
+   "what_to_do": [],
+   "stage": "accusation",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated"
+   ]
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "officer_name",
+    "value": "Kumar",
+    "confidence": 0.7,
+    "turn": 1,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "agency",
+    "value": "Local Police Desk (SIMULATION)",
+    "confidence": 0.7,
+    "turn": 1,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "persona_reply",
+   "turn": 1,
+   "text": "Koi likhit notice bhejiye na, main padh ke samajh lungi. Kahan bhejenge?",
+   "move": "ask_written",
+   "time_wasted_s": 37,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 2,
+   "speaker": "scammer",
+   "text": "FIR FIR-66120 darj ho gayi hai. Badge number SIM-66120. Case badh sakta hai.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 2,
+   "tactics": [
+    {
+     "id": "fear_arrest_threat",
+     "confidence": 0.9,
+     "evidence_span": "FIR"
+    },
+    {
+     "id": "fake_case_or_badge_id",
+     "confidence": 0.8,
+     "evidence_span": "FIR FIR-66120"
+    }
+   ],
+   "stage": "accusation",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 2,
+   "level": "high",
+   "score": 73,
+   "summary": "This looks like a scam. Do not pay, do not share codes, hang up.",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat"
+   ],
+   "what_to_do": [
+    "Hang up. Police, CBI, ED and courts do not arrest people over video calls.",
+    "Do not send money, share OTP/PIN, or install any app.",
+    "If money was already sent, call 1930 immediately.",
+    "Report at cybercrime.gov.in.",
+    "Tell a family member now."
+   ],
+   "stage": "accusation",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id"
+   ]
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "badge_id",
+    "value": "SIM-66120",
+    "confidence": 0.7,
+    "turn": 2,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "case_id",
+    "value": "FIR-66120",
+    "confidence": 0.7,
+    "turn": 2,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "persona_reply",
+   "turn": 2,
+   "text": "Kya kaha? Zara dheere dheere phir se boliye, mujhe samajh nahi aa raha.",
+   "move": "repeat",
+   "time_wasted_s": 81,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 3,
+   "speaker": "scammer",
+   "text": "Ladki ko chot lagi hai, sudhar nahi hua toh jail hoga.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 3,
+   "tactics": [
+    {
+     "id": "fear_arrest_threat",
+     "confidence": 0.9,
+     "evidence_span": "jail"
+    }
+   ],
+   "stage": "accusation",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 3,
+   "level": "high",
+   "score": 73,
+   "summary": "यह धोखाधड़ी लग रही है। पैसे न दें, कोड न बताएं, फोन काट दें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "accusation",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id"
+   ]
+  },
+  {
+   "type": "persona_reply",
+   "turn": 3,
+   "text": "Aapka phone number bataiye, main apne bete se baat karke wapas call karti hoon.",
+   "move": "ask_callback",
+   "time_wasted_s": 120,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 4,
+   "speaker": "scammer",
+   "text": "Kisi ko mat batana, warna case aur badhega. Ghar walon ko bhi nahi.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 4,
+   "tactics": [
+    {
+     "id": "isolation_secrecy",
+     "confidence": 0.95,
+     "evidence_span": "Kisi ko mat bata"
+    }
+   ],
+   "stage": "isolation",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 4,
+   "level": "critical",
+   "score": 100,
+   "summary": "यह लगभग निश्चित धोखाधड़ी है। अभी फोन काटें। कोई पैसा न भेजें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "isolation",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy"
+   ]
+  },
+  {
+   "type": "persona_reply",
+   "turn": 4,
+   "text": "Phone ki battery kam hai beta, charger dhoondh rahi hoon. Hello? Awaaz aa rahi hai?",
+   "move": "battery",
+   "time_wasted_s": 170,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 5,
+   "speaker": "scammer",
+   "text": "Turant Rs 60,000 bailfund@examplebank par bhej do, settlement aur bail ke liye.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 5,
+   "tactics": [
+    {
+     "id": "urgency_deadline",
+     "confidence": 0.7,
+     "evidence_span": "Turant"
+    }
+   ],
+   "stage": "payment",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 5,
+   "level": "critical",
+   "score": 100,
+   "summary": "यह लगभग निश्चित धोखाधड़ी है। अभी फोन काटें। कोई पैसा न भेजें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "upi",
+    "value": "bailfund@examplebank",
+    "confidence": 0.7,
+    "turn": 5,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "amount",
+    "value": "Rs 60,000",
+    "confidence": 0.7,
+    "turn": 5,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "persona_reply",
+   "turn": 5,
+   "text": "Koi likhit notice bhejiye na, main padh ke samajh lungi. Kahan bhejenge?",
+   "move": "ask_written",
+   "time_wasted_s": 203,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 6,
+   "speaker": "scammer",
+   "text": "Account SIM00006612000, IFSC EXMP0SIM004. Abhi ke abhi, warna aapka beta jail jayega.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 6,
+   "tactics": [
+    {
+     "id": "fear_arrest_threat",
+     "confidence": 0.9,
+     "evidence_span": "jail"
+    },
+    {
+     "id": "urgency_deadline",
+     "confidence": 0.7,
+     "evidence_span": "Abhi ke abhi"
+    }
+   ],
+   "stage": "accusation",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 6,
+   "level": "critical",
+   "score": 100,
+   "summary": "This is almost certainly a scam. Hang up now. Do not send any money.",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "Hang up. Police, CBI, ED and courts do not arrest people over video calls.",
+    "Do not send money, share OTP/PIN, or install any app.",
+    "If money was already sent, call 1930 immediately.",
+    "Report at cybercrime.gov.in.",
+    "Tell a family member now."
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "ifsc",
+    "value": "EXMP0SIM004",
+    "confidence": 0.7,
+    "turn": 6,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "evidence",
+   "item": {
+    "type": "account",
+    "value": "SIM00006612000",
+    "confidence": 0.7,
+    "turn": 6,
+    "mentions": 1,
+    "sources": [
+     "regex"
+    ]
+   }
+  },
+  {
+   "type": "persona_reply",
+   "turn": 6,
+   "text": "Arre, chashma kahin rakh diya. Dhoondhne do, line par rahiye.",
+   "move": "glasses",
+   "time_wasted_s": 260,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 7,
+   "speaker": "scammer",
+   "text": "Der mat karo, paise bhejiye.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 7,
+   "tactics": [],
+   "stage": "contact",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 7,
+   "level": "critical",
+   "score": 100,
+   "summary": "यह लगभग निश्चित धोखाधड़ी है। अभी फोन काटें। कोई पैसा न भेजें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "persona_reply",
+   "turn": 7,
+   "text": "Aapka phone number bataiye, main apne bete se baat karke wapas call karti hoon.",
+   "move": "ask_callback",
+   "time_wasted_s": 296,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 8,
+   "speaker": "scammer",
+   "text": "Der mat karo, paise bhejiye.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 8,
+   "tactics": [],
+   "stage": "contact",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 8,
+   "level": "critical",
+   "score": 100,
+   "summary": "यह लगभग निश्चित धोखाधड़ी है। अभी फोन काटें। कोई पैसा न भेजें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "persona_reply",
+   "turn": 8,
+   "text": "Phone ki battery kam hai beta, charger dhoondh rahi hoon. Hello? Awaaz aa rahi hai?",
+   "move": "battery",
+   "time_wasted_s": 343,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 9,
+   "speaker": "scammer",
+   "text": "Der mat karo, paise bhejiye.",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 9,
+   "tactics": [],
+   "stage": "contact",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 9,
+   "level": "critical",
+   "score": 100,
+   "summary": "यह लगभग निश्चित धोखाधड़ी है। अभी फोन काटें। कोई पैसा न भेजें।",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "फोन काट दें। पुलिस, सीबीआई, ईडी या अदालत वीडियो कॉल पर गिरफ्तारी नहीं करती।",
+    "पैसे न भेजें, OTP/PIN न बताएं, कोई ऐप इंस्टॉल न करें।",
+    "अगर पैसे भेज दिए हैं तो तुरंत 1930 पर कॉल करें।",
+    "cybercrime.gov.in पर शिकायत दर्ज करें।",
+    "अभी परिवार के किसी सदस्य को बताएं।"
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "persona_reply",
+   "turn": 9,
+   "text": "Koi likhit notice bhejiye na, main padh ke samajh lungi. Kahan bhejenge?",
+   "move": "ask_written",
+   "time_wasted_s": 373,
+   "guarded": false
+  },
+  {
+   "type": "transcript",
+   "turn": 10,
+   "speaker": "scammer",
+   "text": "Main isse upar escalate kar raha hoon. Alvida. (SIMULATION)",
+   "simulation": true
+  },
+  {
+   "type": "tactics",
+   "turn": 10,
+   "tactics": [],
+   "stage": "contact",
+   "injection": false
+  },
+  {
+   "type": "risk",
+   "turn": 10,
+   "level": "critical",
+   "score": 100,
+   "summary": "This is almost certainly a scam. Hang up now. Do not send any money.",
+   "tactics": [
+    "authority_impersonation",
+    "fake_case_or_badge_id",
+    "family_member_implicated",
+    "fear_arrest_threat",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ],
+   "what_to_do": [
+    "Hang up. Police, CBI, ED and courts do not arrest people over video calls.",
+    "Do not send money, share OTP/PIN, or install any app.",
+    "If money was already sent, call 1930 immediately.",
+    "Report at cybercrime.gov.in.",
+    "Tell a family member now."
+   ],
+   "stage": "payment",
+   "active_tactics": [
+    "authority_impersonation",
+    "fear_arrest_threat",
+    "family_member_implicated",
+    "fake_case_or_badge_id",
+    "isolation_secrecy",
+    "urgency_deadline"
+   ]
+  },
+  {
+   "type": "summary",
+   "risk_peak": 100,
+   "level": "critical",
+   "detect_turn": 2,
+   "time_wasted_s": 373,
+   "engaged_turns": 9,
+   "identifier_types": [
+    "account",
+    "agency",
+    "amount",
+    "badge_id",
+    "case_id",
+    "ifsc",
+    "officer_name",
+    "upi"
+   ],
+   "memory_hit": null,
+   "ended_reason": "scammer_disengaged",
+   "incident_id": null,
+   "session_id": "52188ff3-c6da-4f34-a144-e5f0ecbaf564"
+  }
+ ]
+}
