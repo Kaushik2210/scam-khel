@@ -8,12 +8,27 @@ updates:
     directory: /frontend
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Major migrations are done deliberately, not by bot (see closed PRs for context).
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: tailwindcss
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
   - package-ecosystem: docker
     directory: /backend
     schedule: { interval: monthly }
+    ignore:
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: docker
     directory: /frontend
     schedule: { interval: monthly }
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
