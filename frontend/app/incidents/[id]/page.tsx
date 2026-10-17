@@ -25,6 +25,7 @@ interface Detail {
   verifications: Verification[];
   transcript: { turn: number; speaker: Line["speaker"]; text: string }[];
   evidence: EvidenceItem[];
+  final_analysis?: { summary: string; modus_operandi: string[]; recommendations: string[] } | null;
 }
 
 export default function IncidentPage() {
@@ -102,6 +103,19 @@ export default function IncidentPage() {
                   aria-label={t("incidents.replay")}
                 />
               </label>
+            </Card>
+          )}
+          {data.final_analysis && (
+            <Card title={t("incidents.analysis")}>
+              <p className="text-body">{data.final_analysis.summary}</p>
+              {data.final_analysis.modus_operandi.length > 0 && (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-callout">
+                  {data.final_analysis.modus_operandi.map((m) => (
+                    <li key={m}>{m}</li>
+                  ))}
+                </ul>
+              )}
+              <p className="mt-2 text-footnote text-label3">{t("incidents.analysisNote")}</p>
             </Card>
           )}
           <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">

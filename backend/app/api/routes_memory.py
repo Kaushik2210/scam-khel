@@ -94,6 +94,7 @@ async def incident(incident_id: int, ctx: UserDep = Depends(current_user)) -> di
         "scenario": d.get("scenario"),
         "timeline": d.get("timeline", []),
         "verifications": d.get("verifications", []),
+        "final_analysis": d.get("final_analysis"),
         "transcript": [{"turn": u.turn, "speaker": u.speaker, "text": t} for u, t in utts],
         "evidence": [
             {"type": e.type, "value": e.value, "confidence": round(e.confidence, 2)} for e in ev

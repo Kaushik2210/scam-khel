@@ -110,7 +110,7 @@ async def main() -> int:
             f"| {jsn} | {tools} |"
         )
 
-    rec = "tools" if tools_ok_all else "json_prompt"
+    rec = "json_prompt"  # tool calling is probed below but not implemented in the client yet
     lines += [
         "",
         f"**Recommended `STRUCTURED_MODE`: `{rec}`**"

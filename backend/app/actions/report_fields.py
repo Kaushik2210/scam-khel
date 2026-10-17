@@ -33,6 +33,9 @@ _ID_LABELS = {
 
 def build_narrative(d: ComplaintData, redact: bool = True) -> str:
     """Plain-language incident narrative, in the first person, from observed data only."""
+    if d.final_analysis and d.final_analysis.get("narrative"):
+        prefix = "[SIMULATION: fictional training scenario. Do not file.] " if d.simulation else ""
+        return prefix + str(d.final_analysis["narrative"])
     tactics: list[str] = []
     for p in d.timeline:
         for t in p.get("tactics", []):

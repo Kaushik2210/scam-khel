@@ -34,3 +34,8 @@ Legend: ✅ verified here · ⚠️ partly verified · ❌ not verified (needs y
 4. Build and run the Docker images; deploy to Vercel + a container host with a volume.
 5. Run gitleaks over history; confirm the MIT license badge on GitHub.
 6. Record a screenshot set and the ≤3-minute video after one dry run with real keys; submit on Devpost; fill the feedback form.
+
+## Addendum (2026-10-17, handover)
+- The **deep tier** (`MODEL_DEEP`) was documented from the start but was not called anywhere until this addendum; it now runs once per incident (`backend/app/analysis/final.py`) and feeds the complaint narrative. Verified with a mocked LLM only.
+- `STRUCTURED_MODE=tools|auto` is **not implemented** (JSON-prompt protocol only); `check_models.py` now always recommends `json_prompt`.
+- Full list of gaps and the prioritised backlog: [HANDOVER.md](HANDOVER.md).

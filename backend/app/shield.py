@@ -8,6 +8,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.analysis.final import run_final_analysis
 from app.detect.risk import CAUTION, HIGH, RiskEngine, active_tactics, explain
 from app.detect.tagger import guess_language, tag_utterance
 from app.evidence.extractor import EvidenceStore
@@ -177,6 +178,7 @@ class ShieldAnalyzer:
             summary=f"shield: peak risk {r.score}, {len(r.evidence)} identifiers",
             memory_hit_turn=(r.memory_hit or {}).get("hit_turn"),
         )
+        fa = await run_final_analysis(self.llm, r.transcript, list(self.risk.state.tactics), False)
         inc.data = {
             "scenario": "shield",
             "timeline": r.timeline,
@@ -184,6 +186,7 @@ class ShieldAnalyzer:
             "risk_peak": r.score,
             "time_wasted_s": 0,
             "simulation": False,
+            "final_analysis": {**fa.model_dump(), "tier": "deep"} if fa else None,
         }
         r.incident_id = inc.id
         await self.db.commit()

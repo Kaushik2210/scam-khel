@@ -12,6 +12,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.actions.complaint import ComplaintData
+from app.analysis.final import run_final_analysis
 from app.detect.risk import CAUTION, HIGH, RiskEngine, active_tactics, explain
 from app.detect.tagger import guess_language, tag_utterance
 from app.evidence.extractor import EvidenceStore
@@ -59,6 +60,7 @@ class SessionSummary:
     transcript: list[dict[str, Any]] = field(default_factory=list)
     timeline: list[dict[str, Any]] = field(default_factory=list)
     verifications: list[dict[str, Any]] = field(default_factory=list)
+    final_analysis: dict[str, Any] | None = None
 
     def complaint_data(self, transaction: dict[str, str] | None = None) -> ComplaintData:
         return ComplaintData(
@@ -76,6 +78,7 @@ class SessionSummary:
             transcript=self.transcript,
             verifications=self.verifications,
             transaction=transaction,
+            final_analysis=self.final_analysis,
         )
 
 
@@ -275,6 +278,8 @@ class Orchestrator:
             sm.ended_reason = "max_turns"
 
         sm.evidence = [r.as_dict() for r in store.items()]
+        fa = await run_final_analysis(self.llm, sm.transcript, list(risk.state.tactics), True)
+        sm.final_analysis = {**fa.model_dump(), "tier": "deep"} if fa else None
         await self._persist(sm, history, store, learn_turns)
         await self.emit(
             "summary",
@@ -363,6 +368,7 @@ class Orchestrator:
             "risk_peak": sm.risk_peak,
             "time_wasted_s": sm.time_wasted_s,
             "simulation": True,
+            "final_analysis": sm.final_analysis,
         }
         sm.incident_id = inc.id
         await self.db.commit()

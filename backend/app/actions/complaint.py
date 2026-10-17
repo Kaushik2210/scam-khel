@@ -30,6 +30,7 @@ class ComplaintData:
     transcript: list[dict[str, Any]] = field(default_factory=list)  # turn, speaker, text
     verifications: list[dict[str, Any]] = field(default_factory=list)
     transaction: dict[str, str] | None = None  # from the panic flow
+    final_analysis: dict[str, Any] | None = None  # DEEP-tier analysis, when an LLM was available
     generated: str = field(default_factory=lambda: datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"))
 
 
@@ -82,6 +83,14 @@ def build_markdown(d: ComplaintData, redact: bool = True, max_excerpts: int = 12
         L += ["## 3. Transaction details (from panic flow)", "", "| Field | Value |", "|---|---|"]
         L += [f"| {k} | {v} |" for k, v in d.transaction.items()]
         L += [""]
+    if d.final_analysis:
+        L += [
+            "## 3b. Analysis summary (AI-assisted, review before filing)",
+            "",
+            str(d.final_analysis.get("summary", "")),
+            "",
+        ]
+        L += [f"- {m}" for m in d.final_analysis.get("modus_operandi", [])] + [""]
     L += [
         "## 4. Modus operandi timeline",
         "",

@@ -23,3 +23,8 @@
 | 19 | Frontend on Next 16 / React 19 (spec said Next 14) | Next 14.x has unfixed advisories incl. one critical; security over spec version. |
 | 20 | `react-hooks/set-state-in-effect` lint rule disabled | Intentional post-mount reads of browser-only state to avoid hydration mismatches. |
 | 21 | Held-out eval set + disclosed post-hoc awareness fix | Tuned-set metrics are optimistic; report says so. |
+| 22 | Deep tier runs once per incident for final analysis + first-person complaint narrative, on sanitized, delimited text, with a deterministic fallback | Spec 2/5: strongest model for final analysis/complaint. It was missing until the handover audit. |
+| 23 | `STRUCTURED_MODE=tools` reserved, not implemented | JSON-prompt + repair is the only implemented path; tool calling needs a live model to validate (backlog P1-01). |
+| 24 | Report assistant never submits to cybercrime.gov.in | Portal needs the complainant's login, OTP and captcha; automating them would bypass safeguards and could file false complaints. |
+| 25 | Light theme is the default; Auto/Dark available | Friendlier for elders and first impressions; HIG says support both. |
+

@@ -89,4 +89,5 @@ async def complaint_from_db(
         ],
         transcript=[{"turn": u.turn, "speaker": u.speaker, "text": t} for u, t in utts],
         verifications=data.get("verifications", []),
+        final_analysis=data.get("final_analysis"),
     )

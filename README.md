@@ -173,7 +173,7 @@ docs/               model report, manual steps, final audit, screenshots
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Use synthetic data only. Security issues: [SECURITY.md](SECURITY.md). History: [CHANGELOG.md](CHANGELOG.md).
+Taking over the project? Start with [docs/HANDOVER.md](docs/HANDOVER.md) (status, backlog, gotchas) and [docs/PROMPTS.md](docs/PROMPTS.md). Then read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Use synthetic data only. Security issues: [SECURITY.md](SECURITY.md). History: [CHANGELOG.md](CHANGELOG.md).
 
 ## Roadmap
 

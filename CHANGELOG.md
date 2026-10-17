@@ -2,6 +2,15 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.2.1] - 2026-10-17
+
+### Added
+- Deep-tier final analysis (`MODEL_DEEP`) and AI-assisted complaint narrative; shown on the incident page.
+- `docs/HANDOVER.md` and `docs/PROMPTS.md` for the team taking over.
+
+### Fixed
+- Docs claimed tool-calling structured mode and deep-tier use that were not implemented; corrected.
+
 ## [0.2.0] - 2026-10-17
 
 ### Added
