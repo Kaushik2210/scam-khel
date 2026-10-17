@@ -11,6 +11,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.actions.complaint import ComplaintData
 from app.detect.risk import CAUTION, HIGH, RiskEngine, active_tactics, explain
 from app.detect.tagger import guess_language, tag_utterance
 from app.evidence.extractor import EvidenceStore
@@ -24,6 +25,7 @@ from app.memory.retrieval import MemoryHit, first_appearance_sequence, recognize
 from app.persona.persona import Persona, PersonaConfig
 from app.simulator.scammer import ScammerSim
 from app.simulator.scenario import load_scenario
+from app.verify.tavily_verifier import TavilyVerifier
 
 log = get_logger("orchestrator")
 
@@ -55,6 +57,26 @@ class SessionSummary:
     evidence: list[dict[str, object]] = field(default_factory=list)
     ended_reason: str = "completed"
     transcript: list[dict[str, Any]] = field(default_factory=list)
+    timeline: list[dict[str, Any]] = field(default_factory=list)
+    verifications: list[dict[str, Any]] = field(default_factory=list)
+
+    def complaint_data(self, transaction: dict[str, str] | None = None) -> ComplaintData:
+        return ComplaintData(
+            incident_id=self.incident_id,
+            scenario=self.scenario,
+            simulation=True,
+            risk_peak=self.risk_peak,
+            summary=(
+                f"Simulated {self.scenario} call. Risk peaked at {self.risk_peak}/100 "
+                f"({self.level}); {len(self.evidence)} identifiers extracted; "
+                f"{self.time_wasted_s}s of the caller's time was spent by the decoy persona."
+            ),
+            timeline=self.timeline,
+            evidence=self.evidence,
+            transcript=self.transcript,
+            verifications=self.verifications,
+            transaction=transaction,
+        )
 
 
 class Orchestrator:
@@ -68,7 +90,9 @@ class Orchestrator:
         user_id: int | None = None,
         seed: int = 0,
         persona_config: PersonaConfig | None = None,
+        verifier: TavilyVerifier | None = None,
     ) -> None:
+        self.verifier = verifier
         self.llm, self.db, self.cipher = llm, db, cipher
         self.emit = emit or _noop_emit
         self.alert_hook = alert_hook
@@ -96,6 +120,7 @@ class Orchestrator:
         turn_tactics: list[list[str]] = []
         learn_turns: list[LearnTurn] = []
         alerted: set[str] = set()
+        verified: set[str] = set()
 
         if self.db is not None and self.user_id is not None:
             self.db.add(
@@ -199,8 +224,10 @@ class Orchestrator:
                     },
                 )
 
-            for rec in await store.ingest(turn.text, n, self.llm):
+            new_items = await store.ingest(turn.text, n, self.llm)
+            for rec in new_items:
                 await self.emit("evidence", rec.as_dict())
+            await self._verify(sm, st.level, new_items, verified)
 
             if turn.done:
                 sm.ended_reason = "scammer_disengaged"
@@ -262,6 +289,31 @@ class Orchestrator:
             },
         )
         return sm
+
+    async def _verify(
+        self, sm: SessionSummary, level: str, new_items: list[Any], done: set[str]
+    ) -> None:
+        """Tavily checks, each at most once per session: advisory, agency claim, number/UPI."""
+        if self.verifier is None:
+            return
+        todo: list[tuple[str, Any]] = []
+        if level in ("high", "critical") and "advisory" not in done:
+            done.add("advisory")
+            todo.append(("advisory", self.verifier.fetch_advisory()))
+        for rec in new_items:
+            key = f"{rec.type}:{rec.value}"
+            if key in done:
+                continue
+            if rec.type == "agency":
+                done.add(key)
+                todo.append((key, self.verifier.check_claim(rec.value)))
+            elif rec.type in ("phone", "upi"):
+                done.add(key)
+                todo.append((key, self.verifier.search_reports(rec.value)))
+        for _, coro in todo:
+            v = (await coro).as_dict()
+            sm.verifications.append(v)
+            await self.emit("verification", v)
 
     async def _persist(
         self,

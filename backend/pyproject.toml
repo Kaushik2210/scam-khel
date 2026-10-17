@@ -29,6 +29,7 @@ dev = [
   "ruff>=0.4",
   "mypy>=1.10",
   "types-PyYAML",
+  "pypdf",
   "pip-audit",
 ]
 
@@ -60,3 +61,7 @@ ignore = ["S101", "E501"]  # formatter owns line length; long regex/prose lines 
 python_version = "3.11"
 strict = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["reportlab.*", "tavily.*", "pypdf.*"]
+ignore_missing_imports = true
