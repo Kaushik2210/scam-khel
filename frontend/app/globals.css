@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Semantic colour tokens. Dark follows prefers-color-scheme; dark is also the no-preference
+   fallback (calm, low-glare). Values mirror Apple system colours. Text on tinted fills always uses
+   --label, never the tint itself, so contrast holds in both modes (WCAG AA). */
+:root {
+  color-scheme: dark light;
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --raised: #2c2c2e;
+  --label: #ffffff;
+  --label-2: rgba(235, 235, 245, 0.72);
+  --label-3: rgba(235, 235, 245, 0.55);
+  --separator: rgba(84, 84, 88, 0.65);
+  --tint: #0a84ff;
+  --tint-on: #ffffff;
+  --ok: #30d158;
+  --warn: #ff9f0a;
+  --danger: #ff6a5f;
+  --crit: #ff453a;
+  --ok-bg: rgba(48, 209, 88, 0.16);
+  --warn-bg: rgba(255, 159, 10, 0.18);
+  --danger-bg: rgba(255, 106, 95, 0.2);
+  --crit-bg: rgba(255, 69, 58, 0.24);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --raised: #f2f2f7;
+    --label: #000000;
+    --label-2: rgba(60, 60, 67, 0.82);
+    --label-3: rgba(60, 60, 67, 0.65);
+    --separator: rgba(60, 60, 67, 0.29);
+    --tint: #0062cc;
+    --tint-on: #ffffff;
+    --ok: #1d7a35;
+    --warn: #a35a00;
+    --danger: #c4281c;
+    --crit: #b3001b;
+    --ok-bg: rgba(52, 199, 89, 0.16);
+    --warn-bg: rgba(255, 149, 0, 0.18);
+    --danger-bg: rgba(255, 59, 48, 0.14);
+    --crit-bg: rgba(255, 59, 48, 0.2);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --label-2: var(--label);
+    --label-3: var(--label);
+    --separator: var(--label-2);
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--label);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI",
+    "Noto Sans Devanagari", Roboto, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.375rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus for keyboard users (never removed) */
+:focus-visible {
+  outline: 3px solid var(--tint);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .card {
+    @apply rounded-card bg-surface p-4;
+  }
+  .btn {
+    @apply inline-flex min-h-tap min-w-tap items-center justify-center gap-2 rounded-ctl px-5 text-body font-semibold transition-opacity;
+  }
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-tint text-tint-on;
+  }
+  .btn-secondary {
+    @apply btn bg-raised text-label;
+  }
+  .btn-danger {
+    @apply btn bg-crit text-white;
+  }
+  .btn-plain {
+    @apply btn bg-transparent text-tint;
+  }
+  .field {
+    @apply min-h-tap w-full rounded-ctl border border-sep bg-raised px-3 text-body text-label placeholder:text-label3;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full bg-raised px-3 py-1 text-footnote text-label2;
+  }
+  .sim-badge {
+    @apply inline-flex items-center rounded-full border border-warn bg-warn-bg px-3 py-1 text-footnote font-semibold uppercase tracking-wide text-label;
+  }
+}
+
+/* Motion is functional only; honour Reduce Motion with no animation at all. */
+@media (prefers-reduced-motion: no-preference) {
+  .anim-in {
+    animation: rise 0.25s ease-out both;
+  }
+  .meter-fill {
+    transition: width 0.5s ease-out, background-color 0.3s ease-out;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
