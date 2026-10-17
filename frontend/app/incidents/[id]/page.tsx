@@ -73,6 +73,9 @@ export default function IncidentPage() {
             <button type="button" className="btn-primary" onClick={() => dl("pdf")}>
               <Icon name="download" /> {t("actions.pdf")}
             </button>
+            <Link href={`/report?incident=${data.id}`} className="btn-secondary" data-testid="file-report">
+              <Icon name="doc" /> {t("nav.fileReport")}
+            </Link>
             <button type="button" className="btn-secondary" onClick={() => dl("md")}>
               {t("actions.md")}
             </button>

@@ -21,3 +21,4 @@ playwright-report/
 frontend/*.tsbuildinfo
 backend/data/
 frontend/next-env.d.ts
+frontend/AGENTS.md

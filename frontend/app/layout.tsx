@@ -1,17 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "SCAM-KHEL: family shield against digital-arrest scams",
   description:
     "Detect fake-police scam calls, waste scammers' time with a simulated decoy, alert your family and draft a complaint. Hackathon demo: simulation only.",
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1, colorScheme: "dark light" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, colorScheme: "light dark" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <a
           href="#main"

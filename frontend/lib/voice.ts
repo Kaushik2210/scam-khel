@@ -54,3 +54,81 @@ export function speak(text: string, lang: "en" | "hi") {
 }
 
 export const stopSpeaking = () => canSpeak() && window.speechSynthesis.cancel();
+
+// ---- continuous listening (Listen mode) ----
+interface LiveRec {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult:
+    | ((e: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void)
+    | null;
+  onerror: ((e: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+}
+
+/**
+ * Listen continuously. Calls onFinal for each finished phrase and onInterim for the phrase in
+ * progress. Browsers end recognition after silence, so it restarts until the returned stop() is called.
+ * Audio never leaves the browser's speech engine path and is never stored by SCAM-KHEL.
+ */
+export function listenContinuous(
+  lang: "en" | "hi",
+  onFinal: (t: string) => void,
+  onInterim: (t: string) => void,
+  onEnd: (reason: "stopped" | "denied" | "error") => void,
+): () => void {
+  const C = ctor() as unknown as (new () => LiveRec) | null;
+  if (!C) {
+    onEnd("error");
+    return () => {};
+  }
+  let stopped = false;
+  const r = new C();
+  r.lang = lang === "hi" ? "hi-IN" : "en-IN";
+  r.interimResults = true;
+  r.continuous = true;
+  r.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      const text = res[0]?.transcript?.trim() ?? "";
+      if (!text) continue;
+      if (res.isFinal) onFinal(text);
+      else interim += `${text} `;
+    }
+    onInterim(interim.trim());
+  };
+  r.onerror = (e) => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      stopped = true;
+      onEnd("denied");
+    }
+  };
+  r.onend = () => {
+    if (stopped) return;
+    try {
+      r.start(); // silence timeout: keep listening
+    } catch {
+      stopped = true;
+      onEnd("error");
+    }
+  };
+  try {
+    r.start();
+  } catch {
+    onEnd("error");
+  }
+  return () => {
+    stopped = true;
+    onInterim("");
+    try {
+      r.stop();
+    } catch {
+      /* already stopped */
+    }
+    onEnd("stopped");
+  };
+}

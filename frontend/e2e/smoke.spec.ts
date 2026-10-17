@@ -44,6 +44,51 @@ test("shield: pasted legit text stays low; delete-all works", async ({ page }) =
   await expect(page.getByText(/all your data was deleted/i)).toBeVisible();
 });
 
+test("theme: light by default, switch to dark and it persists", async ({ page }) => {
+  await page.goto("/");
+  const html = page.locator("html");
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await page.getByTestId("theme-dark").click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await page.getByTestId("theme-light").click();
+  await expect(html).toHaveAttribute("data-theme", "light");
+});
+
+test("report assistant: copy-ready fields, official portal link, never submits", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("sk_consent_v1", "granted"));
+  await page.goto("/live");
+  await page.getByTestId("example-scam").click();
+  await page.getByTestId("analyze").click();
+  await expect(page.getByTestId("risk-level")).toHaveAttribute("data-level", "critical", { timeout: 20_000 });
+  await page.getByRole("button", { name: /^stop$/i }).click();
+  await page.getByTestId("to-report").click();
+  await expect(page).toHaveURL(/\/report\?incident=\d+/);
+  await expect(page.getByText(/never submits a report/i).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Suspect details" })).toBeVisible();
+  await expect(page.getByTestId("copy-value").filter({ hasText: "simverify@examplebank" }).first()).toBeVisible();
+  await expect(page.getByTestId("open-portal")).toHaveAttribute("href", "https://cybercrime.gov.in");
+  await expect(page.getByRole("button", { name: /^submit/i })).toHaveCount(0);
+  // step checklist persists progress
+  await page.getByRole("checkbox").first().check();
+  await expect(page.getByText(/1\/6 steps done/)).toBeVisible();
+});
+
+test("listen mode: tab opens, consent is requested before the mic starts", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("sk_consent_v1", "granted"));
+  await page.goto("/live");
+  await page.getByTestId("tab-listen").click();
+  const toggle = page.getByTestId("listen-toggle");
+  const unsupported = page.getByText(/cannot listen live/i);
+  await expect(toggle.or(unsupported)).toBeVisible();
+  if (await toggle.isVisible()) {
+    await toggle.click();
+    await expect(page.getByRole("dialog")).toContainText(/does not record or store audio/i);
+    await page.getByRole("button", { name: /cancel/i }).click();
+  }
+});
+
 // Keep the download test last: some browsers (Edge) tear down the browser after a blob download.
 test("landing → consent → simulation → risk climbs → complaint PDF", async ({ page }) => {
   await page.goto("/");

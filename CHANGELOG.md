@@ -2,6 +2,13 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.2.0] - 2026-10-17
+
+### Added
+- **Listen mode**: live speech-to-text of a call on speaker (browser Web Speech) feeding Shield, with consent prompt.
+- **Report assistant** (`/report`, `GET /api/incidents/{id}/report-fields`): step checklist and copy-ready fields for cybercrime.gov.in. Never submits.
+- Light / Auto / Dark theme (light by default, no flash), landing features + FAQ, risk-explanation language now follows the UI language.
+
 ## [0.1.0] - 2026-10-17
 
 First hackathon release (Nebius x NVIDIA Global AI Hackathon, Personal AI track).

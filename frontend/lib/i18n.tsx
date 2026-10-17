@@ -1,9 +1,11 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { EXTRA_EN, EXTRA_HI } from "./i18n-extra";
 import type { Lang } from "./types";
 
 const en = {
+  ...EXTRA_EN,
   "brand": "SCAM-KHEL",
   "nav.home": "Home",
   "nav.simulate": "Simulate",
@@ -191,6 +193,7 @@ const en = {
 export type Key = keyof typeof en;
 
 const hi: Record<Key, string> = {
+  ...EXTRA_HI,
   "brand": "स्कैम-खेल",
   "nav.home": "होम",
   "nav.simulate": "सिमुलेशन",

@@ -36,6 +36,7 @@ export default function More() {
     setConfirm(false);
   };
   const links = [
+    ["/report", "nav.fileReport", "doc"],
     ["/parent", "nav.parent", "phone"],
     ["/family", "nav.family", "users"],
     ["/memory", "nav.memory", "brain"],

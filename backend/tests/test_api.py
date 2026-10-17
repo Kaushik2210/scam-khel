@@ -310,3 +310,40 @@ def test_explanation_follows_ui_language_not_caller_language(client):
     ).json()
     assert en["explanation"]["summary"].isascii()
     assert not hi["explanation"]["summary"].isascii()
+
+
+def test_report_fields_for_filing_assistant(client):
+    text = (
+        "This is Inspector Rao from the National Crime Verification Cell. Your Aadhaar is linked to a "
+        "case, warrant ready.\nYou are under digital arrest, do not tell anyone.\n"
+        "Transfer Rs 90,000 to the RBI safe account simverify@examplebank now."
+    )
+    a = client.post(
+        "/api/analyze", headers=H, json={"text": text, "language": "en", "consent": True}
+    ).json()
+    r = client.get(f"/api/incidents/{a['incident_id']}/report-fields", headers=H)
+    assert r.status_code == 200
+    rep = r.json()
+    assert rep["never_submits"] is True and rep["portal"] == "https://cybercrime.gov.in"
+    groups = {g["group"]: g["fields"] for g in rep["groups"]}
+    assert {
+        "Complaint type",
+        "Incident description",
+        "Suspect details",
+        "Evidence to upload",
+    } <= set(groups)
+    suspects = {f["value"] for f in groups["Suspect details"]}
+    assert "simverify@examplebank" in suspects
+    narrative = groups["Incident description"][0]["value"]
+    assert (
+        "I have not transferred any money" in narrative
+        and "digital arrest" in narrative.lower()
+        or "video" in narrative.lower()
+    )
+    assert (
+        client.get(
+            f"/api/incidents/{a['incident_id']}/report-fields",
+            headers={"X-Client-Id": "client-9999-bbbb"},
+        ).status_code
+        == 404
+    )

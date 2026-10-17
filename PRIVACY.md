@@ -6,7 +6,7 @@ SCAM-KHEL is designed local-first and minimal. This page describes what the code
 
 **Consent.** Before any analysis a consent sheet states purpose, what is stored, retention and how to delete. A consent record (notice version, purposes, timestamp) is stored server-side. Without consent the API refuses to analyse.
 
-**What is stored.** Transcripts (Fernet-encrypted at rest), extracted identifiers of the *caller* (phone numbers, UPI IDs...), tactic timelines, family circle labels and Telegram chat IDs you link, consent and alert logs. **No audio is stored**; the browser transcribes speech locally and only text is sent.
+**What is stored.** Transcripts (Fernet-encrypted at rest), extracted identifiers of the *caller* (phone numbers, UPI IDs...), tactic timelines, family circle labels and Telegram chat IDs you link, consent and alert logs. **SCAM-KHEL stores no audio.** In Listen mode and voice input, the browser's speech-recognition service transcribes the speech and only the text is sent to SCAM-KHEL. Depending on the browser, that service may be provided by the browser vendor (for example Chrome sends audio to Google), which is outside SCAM-KHEL's control. Use Listen mode only on calls you are part of, and tell the other party where the law requires it.
 
 **What leaves the server.** Text sent to Nebius Token Factory (NVIDIA Nemotron) is first sanitised: Aadhaar, PAN, card, OTP, phone, UPI, IFSC and account patterns are masked, and family names are replaced with `FAMILY_n`. Phone/UPI-type identifiers are extracted by local regex and are not sent to an LLM. Tavily receives only search queries built from claimed agency names and caller identifiers. Telegram receives alert text (risk level, tactic summary, link).
 

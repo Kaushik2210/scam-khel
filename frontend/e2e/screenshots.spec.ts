@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const OUT = path.resolve(__dirname, "../../docs/screenshots");
 test.skip(!process.env.SCREENSHOTS, "set SCREENSHOTS=1 to regenerate docs/screenshots");
-test.use({ viewport: { width: 1360, height: 900 }, colorScheme: "dark" });
+test.use({ viewport: { width: 1360, height: 900 } });
 
 const consent = (page: import("@playwright/test").Page) =>
   page.addInitScript(() => window.localStorage.setItem("sk_consent_v1", "granted"));
@@ -58,10 +58,29 @@ test("shield and parent", async ({ page }) => {
   await page.screenshot({ path: `${OUT}/06-parent-mobile.png`, fullPage: true });
 });
 
-test("light mode and about", async ({ page }) => {
+test("dark theme, report assistant and listen mode", async ({ page }) => {
   await consent(page);
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/about");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await page.screenshot({ path: `${OUT}/07-about-light.png`, fullPage: true });
+  await page.goto("/live");
+  await page.getByTestId("example-scam").click();
+  await page.getByTestId("analyze").click();
+  await expect(page.getByTestId("risk-level")).toHaveAttribute("data-level", "critical", { timeout: 20_000 });
+  await page.getByRole("button", { name: /^stop$/i }).click();
+  await page.getByTestId("to-report").click();
+  await expect(page.getByRole("heading", { name: "Suspect details" })).toBeVisible();
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: `${OUT}/07-report-assistant.png`, fullPage: true });
+
+  await page.goto("/live");
+  await page.getByTestId("tab-listen").click();
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: `${OUT}/08-listen-mode.png`, fullPage: true });
+
+  await page.goto("/simulate");
+  await page.getByTestId("theme-dark").click();
+  await page.getByTestId("start").click();
+  await expect(page.getByTestId("risk-level")).toHaveAttribute("data-level", "critical", { timeout: 45_000 });
+  await expect(page.getByRole("heading", { name: /simulation finished/i })).toBeVisible({ timeout: 60_000 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: `${OUT}/09-simulate-dark.png`, fullPage: true });
 });

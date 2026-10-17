@@ -5,7 +5,8 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 
-from app.api.helpers import incident_for_user
+from app.actions.report_fields import build_report_fields
+from app.api.helpers import complaint_from_db, incident_for_user
 from app.api.state import AppState, current_user
 from app.memory import repo
 from app.memory.models import EvidenceItem, Incident, ScamScript, Session, User
@@ -109,3 +110,17 @@ async def delete_me(ctx: UserDep = Depends(current_user)) -> dict[str, bool]:
         st.live[k].stop.set()
         del st.live[k]
     return {"deleted": True}
+
+
+@router.get("/api/incidents/{incident_id}/report-fields")
+async def report_fields(
+    incident_id: int, redact: bool = True, ctx: UserDep = Depends(current_user)
+) -> dict[str, Any]:
+    """Structured, copy-ready fields for cybercrime.gov.in (the app never submits anything)."""
+    st, user = ctx
+    async with st.sm() as db:
+        found = await incident_for_user(db, user.id, incident_id=incident_id)
+        if not found:
+            raise HTTPException(404, "not found")
+        data = await complaint_from_db(db, st, *found)
+    return build_report_fields(data, redact)

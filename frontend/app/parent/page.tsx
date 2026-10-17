@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRequireConsent } from "@/components/Consent";
 import { MicButton } from "@/components/MicButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Notice } from "@/components/Panels";
 import { EXAMPLES } from "@/lib/examples";
 import { api, ApiError } from "@/lib/api";
@@ -88,9 +89,12 @@ export default function Parent() {
         <Link href="/" className="min-h-tapxl inline-flex items-center text-callout text-tint underline">
           ← {t("common.back")}
         </Link>
-        <button type="button" className="btn-secondary !min-h-tapxl" onClick={() => setLang(lang === "en" ? "hi" : "en")}>
-          {t("lang.switch")}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button type="button" className="btn-secondary !min-h-tapxl" onClick={() => setLang(lang === "en" ? "hi" : "en")}>
+            {t("lang.switch")}
+          </button>
+        </div>
       </header>
 
       <section aria-labelledby="q" className="space-y-4">

@@ -33,6 +33,8 @@ Fraudsters impersonate police, CBI, ED or customs, claim you or a family member 
 |---|---|
 | **Shield** (detect) | Paste, speak or stream what a caller said. 13 coercion tactics are tagged live (English / Hindi / Hinglish); a 0-100 risk score climbs through `caution ≥40`, `high ≥70`, `critical ≥85`, with a plain-language explanation and a "what to do now" list. |
 | **Honeypot** (bait) | A decoy "confused grandmother" persona stalls a **simulated** scammer, asks for names, IDs, numbers and payment details, and the evidence panel fills while a time-wasted counter climbs. |
+| **Listen mode** | Put a real call on speaker; the browser turns speech into text (hi-IN / en-IN) and Shield scores it live, with a consent prompt first. Needs a browser with speech recognition (Chrome / Edge). SCAM-KHEL stores no audio, but the browser's speech service may process it. |
+| **Report assistant** | Step-by-step guide for cybercrime.gov.in with a copy button for every field of the draft. The portal needs your own login, OTP and captcha, so **SCAM-KHEL never submits anything for you**. |
 | **Parent view** | Very large buttons: "Is this a scam?" and a red **"I already sent money"** flow (1930 checklist, call script, pre-filled transaction form, complaint draft). |
 | **Memory** | Scam scripts are fingerprinted and remembered. A repeat run shows *"Recognised pattern from Incident #N, flagged at turn k vs turn m earlier"* and is treated as high risk immediately. |
 | **Actions** | Telegram family alert, complaint draft (PDF + Markdown) for cybercrime.gov.in, blocklist export (CSV/JSON). |
@@ -43,9 +45,10 @@ Fraudsters impersonate police, CBI, ED or customs, claim you or a family member 
 |---|---|
 | ![Landing](docs/screenshots/01-landing.png) **Landing** | ![Consent](docs/screenshots/02-consent.png) **DPDP-style consent** |
 | ![Simulation](docs/screenshots/03-simulate.png) **Honeypot simulation** | ![Shield](docs/screenshots/05-shield.png) **Shield: pasted call at critical** |
-| ![Parent view](docs/screenshots/06-parent-mobile.png) **Parent view (mobile)** | ![About, light mode](docs/screenshots/07-about-light.png) **Architecture page, light mode** |
+| ![Parent view](docs/screenshots/06-parent-mobile.png) **Parent view (mobile)** | ![Dark theme](docs/screenshots/09-simulate-dark.png) **Dark theme (Light / Auto / Dark toggle)** |
+| ![Report assistant](docs/screenshots/07-report-assistant.png) **Report assistant: copy-ready fields** | ![Listen mode](docs/screenshots/08-listen-mode.png) **Listen mode** |
 
-All screenshots are captured from the running app by `frontend/e2e/screenshots.spec.ts` (offline mode: no API keys were used).
+All screenshots are captured from the running app by `frontend/e2e/screenshots.spec.ts` (offline mode: no API keys were used). The UI defaults to a light theme and also has dark and auto.
 
 ## How it uses Nebius Token Factory + NVIDIA Nemotron
 

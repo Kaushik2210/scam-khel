@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
 import { useRequireConsent } from "@/components/Consent";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type Key } from "@/lib/i18n";
 import { TACTICS, lab } from "@/lib/labels";
 
 const SAMPLE_TACTICS = ["authority_impersonation", "fear_arrest_threat", "stay_on_camera_digital_arrest", "safe_account_transfer"];
@@ -91,6 +91,25 @@ export default function Home() {
         </div>
       </section>
 
+      <section aria-label="Features" className="grid gap-4 md:grid-cols-2">
+        {(
+          [
+            ["/live", "home.feature.listen", "home.feature.listenD", "mic"],
+            ["/report", "home.feature.report", "home.feature.reportD", "doc"],
+          ] as const
+        ).map(([href, h, d, icon]) => (
+          <Link key={href} href={href} className="card group flex items-start gap-4 transition-colors hover:bg-raised">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-tint text-tint-on">
+              <Icon name={icon} size={24} />
+            </span>
+            <span>
+              <span className="block text-headline">{t(h)}</span>
+              <span className="mt-0.5 block text-callout text-label2">{t(d)}</span>
+            </span>
+          </Link>
+        ))}
+      </section>
+
       <section aria-label="How it works" className="grid gap-4 md:grid-cols-3">
         {steps.map(([h, d, icon], i) => (
           <div key={h} className="card">
@@ -131,6 +150,24 @@ export default function Home() {
             </span>
             <span className="text-callout text-label2">{t("home.mode.parentD")}</span>
           </Link>
+        </div>
+      </section>
+      <section aria-labelledby="faq">
+        <h2 id="faq" className="mb-3 text-title2">
+          {t("faq.title")}
+        </h2>
+        <div className="divide-y divide-[var(--separator)] overflow-hidden rounded-card border border-sep bg-surface">
+          {([1, 2, 3, 4] as const).map((n) => (
+            <details key={n} className="group p-4 open:bg-raised">
+              <summary className="flex min-h-tap cursor-pointer list-none items-center justify-between gap-3 text-headline">
+                {t(`faq.q${n}` as Key)}
+                <span className="text-label3 transition-transform group-open:rotate-45" aria-hidden="true">
+                  +
+                </span>
+              </summary>
+              <p className="mt-2 text-callout text-label2">{t(`faq.a${n}` as Key)}</p>
+            </details>
+          ))}
         </div>
       </section>
       <p className="text-callout text-label3">{t("home.demoNote")}</p>

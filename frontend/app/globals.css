@@ -2,11 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Semantic colour tokens. Dark follows prefers-color-scheme; dark is also the no-preference
-   fallback (calm, low-glare). Values mirror Apple system colours. Text on tinted fills always uses
-   --label, never the tint itself, so contrast holds in both modes (WCAG AA). */
-:root {
-  color-scheme: dark light;
+/* Semantic colour tokens (Apple system colours). Three themes via <html data-theme>:
+   light (default), dark, system (follows prefers-color-scheme). A tiny inline script in layout.tsx
+   sets the attribute before first paint so there is no flash. Text on tinted fills always uses
+   --label, never the tint itself, so contrast holds in every theme (WCAG AA). */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --raised: #eef1f7;
+  --label: #0b1220;
+  --label-2: rgba(11, 18, 32, 0.74);
+  --label-3: rgba(11, 18, 32, 0.6);
+  --separator: rgba(60, 70, 100, 0.22);
+  --tint: #0a5fd1;
+  --tint-on: #ffffff;
+  --ok: #1d7a35;
+  --warn: #a35a00;
+  --danger: #c4281c;
+  --crit: #b3001b;
+  --ok-bg: rgba(52, 199, 89, 0.16);
+  --warn-bg: rgba(255, 149, 0, 0.16);
+  --danger-bg: rgba(255, 59, 48, 0.12);
+  --crit-bg: rgba(255, 59, 48, 0.16);
+  --card-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 18px rgba(16, 24, 40, 0.06);
+  --glow: rgba(10, 95, 209, 0.1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #000000;
   --surface: #1c1c1e;
   --raised: #2c2c2e;
@@ -24,27 +49,32 @@
   --warn-bg: rgba(255, 159, 10, 0.18);
   --danger-bg: rgba(255, 106, 95, 0.2);
   --crit-bg: rgba(255, 69, 58, 0.24);
+  --card-shadow: none;
+  --glow: rgba(10, 132, 255, 0.16);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f2f2f7;
-    --surface: #ffffff;
-    --raised: #f2f2f7;
-    --label: #000000;
-    --label-2: rgba(60, 60, 67, 0.82);
-    --label-3: rgba(60, 60, 67, 0.65);
-    --separator: rgba(60, 60, 67, 0.29);
-    --tint: #0062cc;
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    color-scheme: dark;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --raised: #2c2c2e;
+    --label: #ffffff;
+    --label-2: rgba(235, 235, 245, 0.72);
+    --label-3: rgba(235, 235, 245, 0.55);
+    --separator: rgba(84, 84, 88, 0.65);
+    --tint: #0a84ff;
     --tint-on: #ffffff;
-    --ok: #1d7a35;
-    --warn: #a35a00;
-    --danger: #c4281c;
-    --crit: #b3001b;
-    --ok-bg: rgba(52, 199, 89, 0.16);
-    --warn-bg: rgba(255, 149, 0, 0.18);
-    --danger-bg: rgba(255, 59, 48, 0.14);
-    --crit-bg: rgba(255, 59, 48, 0.2);
+    --ok: #30d158;
+    --warn: #ff9f0a;
+    --danger: #ff6a5f;
+    --crit: #ff453a;
+    --ok-bg: rgba(48, 209, 88, 0.16);
+    --warn-bg: rgba(255, 159, 10, 0.18);
+    --danger-bg: rgba(255, 106, 95, 0.2);
+    --crit-bg: rgba(255, 69, 58, 0.24);
+    --card-shadow: none;
+    --glow: rgba(10, 132, 255, 0.16);
   }
 }
 
@@ -61,6 +91,8 @@ html {
 }
 body {
   background: var(--bg);
+  background-image: radial-gradient(900px 380px at 50% -120px, var(--glow), transparent 70%);
+  background-repeat: no-repeat;
   color: var(--label);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI",
     "Noto Sans Devanagari", Roboto, sans-serif;
@@ -79,18 +111,30 @@ body {
 @layer components {
   .card {
     @apply rounded-card bg-surface p-4;
+    border: 1px solid color-mix(in srgb, var(--separator) 55%, transparent);
+    box-shadow: var(--card-shadow);
   }
   .btn {
-    @apply inline-flex min-h-tap min-w-tap items-center justify-center gap-2 rounded-ctl px-5 text-body font-semibold transition-opacity;
+    @apply inline-flex min-h-tap min-w-tap items-center justify-center gap-2 rounded-ctl px-5 text-body font-semibold;
+    transition: transform 0.08s ease-out, opacity 0.15s, background-color 0.15s;
   }
   .btn:disabled {
     @apply cursor-not-allowed opacity-50;
   }
+  .btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
   .btn-primary {
     @apply btn bg-tint text-tint-on;
   }
+  .btn-primary:hover:not(:disabled) {
+    opacity: 0.92;
+  }
   .btn-secondary {
     @apply btn bg-raised text-label;
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--raised) 70%, var(--separator));
   }
   .btn-danger {
     @apply btn bg-crit text-white;
@@ -117,6 +161,12 @@ body {
   .meter-fill {
     transition: width 0.5s ease-out, background-color 0.3s ease-out;
   }
+  .gauge-fill {
+    transition: stroke-dashoffset 0.6s ease-out, stroke 0.3s ease-out;
+  }
+  .skeleton {
+    animation: shimmer 1.4s linear infinite;
+  }
   @keyframes rise {
     from {
       opacity: 0;
@@ -127,6 +177,15 @@ body {
       transform: none;
     }
   }
+  @keyframes shimmer {
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface), var(--raised), var(--surface));
+  background-size: 200% 100%;
 }
 
 .sr-only {
@@ -136,41 +195,6 @@ body {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-}
-
-/* ---- polish layer ---- */
-body {
-  background-image: radial-gradient(900px 380px at 50% -120px, color-mix(in srgb, var(--tint) 16%, transparent), transparent 70%);
-  background-repeat: no-repeat;
-}
-.card {
-  border: 1px solid color-mix(in srgb, var(--separator) 55%, transparent);
-}
-.btn {
-  transition: transform 0.08s ease-out, opacity 0.15s;
-}
-.btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-.btn-primary:hover:not(:disabled) {
-  opacity: 0.92;
-}
-.skeleton {
-  background: linear-gradient(90deg, var(--surface), var(--raised), var(--surface));
-  background-size: 200% 100%;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .gauge-fill {
-    transition: stroke-dashoffset 0.6s ease-out, stroke 0.3s ease-out;
-  }
-  .skeleton {
-    animation: shimmer 1.4s linear infinite;
-  }
-  @keyframes shimmer {
-    to {
-      background-position: -200% 0;
-    }
-  }
 }
 .link-quiet {
   color: var(--label-2);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "./Icon";
+import { ThemeToggle } from "./ThemeToggle";
 import { useI18n, type Key } from "@/lib/i18n";
 
 const TABS: { href: string; key: Key; icon: string; match: (p: string) => boolean }[] = [
@@ -14,8 +15,14 @@ const TABS: { href: string; key: Key; icon: string; match: (p: string) => boolea
     href: "/more",
     key: "nav.more",
     icon: "more",
-    match: (p) => ["/more", "/family", "/memory", "/about"].some((x) => p.startsWith(x)),
+    match: (p) => ["/more", "/family", "/memory", "/about", "/report"].some((x) => p.startsWith(x)),
   },
+];
+
+const DESKTOP_TABS = [
+  ...TABS.slice(0, 3),
+  { href: "/report", key: "nav.report" as Key, icon: "doc", match: (p: string) => p.startsWith("/report") },
+  ...TABS.slice(3),
 ];
 
 const REPO = "https://github.com/Kaushik2210/scam-khel";
@@ -72,7 +79,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             {t("brand")}
           </Link>
           <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
-            {TABS.map((tab) => (
+            {DESKTOP_TABS.map((tab) => (
               <Link
                 key={tab.href}
                 href={tab.href}
@@ -86,9 +93,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/parent" className="btn-secondary !hidden !min-h-tap !px-4 !text-callout md:!inline-flex">
+            <Link href="/parent" className="btn-secondary !hidden !min-h-tap !px-4 !text-callout lg:!inline-flex">
               <Icon name="phone" size={18} /> {t("nav.parent")}
             </Link>
+            <ThemeToggle />
             <LanguageToggle />
           </div>
         </header>
