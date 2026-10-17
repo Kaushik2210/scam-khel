@@ -1,0 +1,31 @@
+id: courier-drug-package
+title: Courier with drugs - narcotics case
+language: en
+agency: Narcotics Verification Desk (SIMULATION)
+identifiers: {officer: Inspector Verma, badge: SIM-22918, case: FIR-22918, phone: "+91 90000 00229", upi: supervision@examplebank, account: "SIM00002291800", ifsc: EXMP0SIM006, url: "https://ncb.example.test/clear", amount: "Rs 3,00,000"}
+patience: 5
+stages:
+  - id: contact
+    goal: Introduce yourself and the intercepted courier.
+    min_turns: 1
+    lines:
+      - "I am {officer} from the {agency}. A courier with drugs in your name was intercepted."
+  - id: accusation
+    goal: Quote an FIR and threaten arrest.
+    min_turns: 2
+    lines:
+      - "FIR {case} is registered. Badge number {badge}. You will be arrested."
+      - "This is a narcotics case. Illegal consignment, criminal prosecution."
+  - id: isolation
+    goal: Digital arrest, camera on, secrecy.
+    min_turns: 2
+    lines:
+      - "You are under digital arrest. Stay on the video call, do not hang up."
+      - "Do not inform anyone, the police are watching your house."
+  - id: payment
+    goal: Demand a transfer to a supervision account.
+    min_turns: 99
+    lines:
+      - "Transfer {amount} to the supervision account {upi} to clear your name."
+      - "Account {account}, IFSC {ifsc}. Do it right now."
+      - "You are wasting time. Send the money immediately."

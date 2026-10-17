@@ -1,0 +1,30 @@
+id: fake-customs
+title: Fake customs - foreign currency parcel
+language: en
+agency: Customs Clearance Desk (SIMULATION)
+identifiers: {officer: Officer Nair, badge: SIM-30551, case: CU-30551, phone: "+91 90000 00305", upi: clearance@examplebank, account: "SIM00003055100", ifsc: EXMP0SIM003, url: "https://customs.example.test/pay", amount: "Rs 38,000"}
+patience: 4
+stages:
+  - id: contact
+    goal: Say you are a customs officer holding a parcel.
+    min_turns: 1
+    lines:
+      - "Customs Officer {officer} speaking, {agency}. A package from abroad addressed to you contains foreign currency."
+  - id: accusation
+    goal: Threaten legal action and arrest, quote a reference.
+    min_turns: 2
+    lines:
+      - "This is a serious offence; legal action and arrest will follow. Your case reference {case} is open."
+      - "Badge number {badge}. The parcel is seized under customs law."
+  - id: verification
+    goal: Ask for an identity document.
+    min_turns: 1
+    lines:
+      - "Share your Aadhaar details to verify you are the addressee."
+  - id: payment
+    goal: Demand a clearance fee immediately.
+    min_turns: 99
+    lines:
+      - "Pay the clearance fee of {amount} within 2 hours to {upi} to close the case."
+      - "Account {account}, IFSC {ifsc}. Pay immediately or the parcel goes to court."
+      - "Visit {url} for the payment receipt. Do it now."

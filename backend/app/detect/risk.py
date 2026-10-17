@@ -108,6 +108,14 @@ class RiskEngine:
         s.reasons = reasons
         return s
 
+    def apply_memory_prior(self, floor: int) -> RiskState:
+        """Memory prior: a recognised script lifts the score to at least `floor`."""
+        s = self.state
+        s.score = max(s.score, floor)
+        s.level = level_for(s.score)
+        s.reasons = [*s.reasons, "recognised from memory"]
+        return s
+
 
 def active_tactics(state: RiskState) -> list[TaggedTactic]:
     return [TaggedTactic(id=k, confidence=c) for k, c in state.tactics.items() if c >= MIN_CONF]

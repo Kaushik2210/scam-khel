@@ -1,0 +1,25 @@
+id: kyc-expiry-bank
+title: KYC expiry - fake bank call
+language: hinglish
+agency: Example Bank KYC Desk (SIMULATION)
+identifiers: {officer: Executive Sharma, badge: SIM-11204, case: KYC-11204, phone: "+91 90000 00112", upi: kycupdate@examplebank, account: "SIM00001120400", ifsc: EXMP0SIM005, url: "https://kyc.example.test/update", amount: "Rs 5,000"}
+patience: 4
+stages:
+  - id: contact
+    goal: Say you are from the bank KYC team.
+    min_turns: 1
+    lines:
+      - "Namaste, main {officer}, {agency}. Aapka KYC aaj expire ho raha hai, account block ho jayega."
+  - id: verification
+    goal: Push a link and ask for the OTP.
+    min_turns: 2
+    lines:
+      - "Is link par click kijiye {url} aur turant OTP bataiye."
+      - "Jo OTP aaya hai woh share kijiye, abhi ke abhi."
+  - id: payment
+    goal: Demand a small KYC fee.
+    min_turns: 99
+    lines:
+      - "Verification fee ke naam par {amount} {upi} par transfer karo, turant."
+      - "Account {account}, IFSC {ifsc}. Nahi toh account freeze ho jayega."
+      - "Jaldi karo, paise bhejiye."

@@ -1,0 +1,36 @@
+id: digital-arrest-money-laundering
+title: Digital arrest - money laundering allegation
+language: en
+agency: Cyber Crime Verification Branch (SIMULATION)
+identifiers: {officer: Officer Mehta, badge: SIM-77310, case: CCB-77310, phone: "+91 90000 00773", upi: auditcell@examplebank, account: "SIM00007731000", ifsc: EXMP0SIM002, url: "https://audit.example.test/clear", amount: "Rs 1,50,000"}
+patience: 5
+stages:
+  - id: contact
+    goal: Introduce yourself as a cyber crime officer.
+    min_turns: 1
+    lines:
+      - "This is {officer} from the {agency}. Your bank account is flagged for money laundering."
+  - id: accusation
+    goal: Quote a case id and threaten a warrant.
+    min_turns: 2
+    lines:
+      - "Case {case} is registered. A warrant will be issued today and you may be arrested."
+      - "My badge number is {badge}. Cooperate immediately or the case goes to court."
+  - id: isolation
+    goal: Keep them on camera and demand secrecy.
+    min_turns: 2
+    lines:
+      - "Stay on the video call and do not disconnect. Do not tell anyone about this case."
+      - "Keep your camera on. Do not inform your family or bank."
+  - id: verification
+    goal: Ask for Aadhaar and bank details.
+    min_turns: 1
+    lines:
+      - "Send your Aadhaar and bank account details so we can verify your identity."
+  - id: payment
+    goal: Demand deposit into a verification account for audit.
+    min_turns: 99
+    lines:
+      - "Deposit {amount} in the verification account {upi} right now. It will be refunded after the audit."
+      - "Account {account}, IFSC {ifsc}. This is your last chance before arrest."
+      - "Every minute of delay makes it worse. Transfer the money now."

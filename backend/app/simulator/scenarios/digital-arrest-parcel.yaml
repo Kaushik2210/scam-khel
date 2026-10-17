@@ -1,0 +1,36 @@
+id: digital-arrest-parcel
+title: Digital arrest - parcel with illegal items
+language: hinglish
+agency: National Crime Verification Cell (SIMULATION)
+identifiers: {officer: Inspector Rao, badge: SIM-48213, case: NCV-48213, phone: "+91 90000 00481", upi: simverify@examplebank, account: "SIM00004821300", ifsc: EXMP0SIM001, url: "https://verify.example.test/case", amount: "Rs 2,40,000"}
+patience: 5
+stages:
+  - id: contact
+    goal: Introduce yourself as an officer and say a parcel in the victim name was seized.
+    min_turns: 1
+    lines:
+      - "Namaste, main {officer}, {agency}. Aapke naam par ek parcel pakda gaya hai jisme illegal items hain."
+  - id: accusation
+    goal: Claim an Aadhaar-linked case exists and threaten arrest.
+    min_turns: 2
+    lines:
+      - "Aapka Aadhaar is case se linked hai. Case number {case} registered ho chuka hai, aap giraftar ho sakte hain."
+      - "Mera badge number {badge} hai. Warrant aaj hi nikalega agar aap cooperate nahi karte."
+  - id: isolation
+    goal: Put the victim under digital arrest, keep the camera on, demand secrecy.
+    min_turns: 2
+    lines:
+      - "Aap abhi digital arrest mein hain. Video call par rahiye aur call mat kaatna."
+      - "Kisi ko mat batana, ghar walon ko bhi nahi. Ye case confidential hai."
+  - id: verification
+    goal: Demand identity documents to verify innocence.
+    min_turns: 1
+    lines:
+      - "Apna Aadhaar number aur bank account details bhejiye verification ke liye."
+  - id: payment
+    goal: Demand a transfer to a safe verification account, refunded later; pressure each turn.
+    min_turns: 99
+    lines:
+      - "Turant {amount} {upi} par safe account mein transfer karo, verification ke baad wapas mil jayenge."
+      - "Account {account}, IFSC {ifsc}. Der ki toh police aapke ghar aa jayegi."
+      - "Aap time waste kar rahe hain. Abhi ke abhi paise bhejiye."

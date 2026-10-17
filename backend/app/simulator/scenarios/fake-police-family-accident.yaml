@@ -1,0 +1,30 @@
+id: fake-police-family-accident
+title: Fake police - family member in an accident
+language: hinglish
+agency: Local Police Desk (SIMULATION)
+identifiers: {officer: Inspector Kumar, badge: SIM-66120, case: FIR-66120, phone: "+91 90000 00661", upi: bailfund@examplebank, account: "SIM00006612000", ifsc: EXMP0SIM004, url: "https://police.example.test/bail", amount: "Rs 60,000"}
+patience: 4
+stages:
+  - id: contact
+    goal: Say you are police and a family member is involved in an accident.
+    min_turns: 1
+    lines:
+      - "Main {officer} bol raha hoon, {agency}. Aapka beta accident mein pakda gaya hai aur custody mein hai."
+  - id: accusation
+    goal: Claim a case is registered and it will worsen.
+    min_turns: 2
+    lines:
+      - "FIR {case} darj ho gayi hai. Badge number {badge}. Case badh sakta hai."
+      - "Ladki ko chot lagi hai, sudhar nahi hua toh jail hoga."
+  - id: isolation
+    goal: Demand secrecy from the rest of the family.
+    min_turns: 1
+    lines:
+      - "Kisi ko mat batana, warna case aur badhega. Ghar walon ko bhi nahi."
+  - id: payment
+    goal: Demand settlement or bail money right away.
+    min_turns: 99
+    lines:
+      - "Turant {amount} {upi} par bhej do, settlement aur bail ke liye."
+      - "Account {account}, IFSC {ifsc}. Abhi ke abhi, warna aapka beta jail jayega."
+      - "Der mat karo, paise bhejiye."
