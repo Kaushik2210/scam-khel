@@ -1,6 +1,6 @@
 # Eval report
 
-Generated 2026-10-17T07:51:46+00:00 · mode: **offline (rules + scripted fallbacks, no LLM)**
+Generated 2026-10-17T07:58:26+00:00 · mode: **offline (rules + scripted fallbacks, no LLM)**
 
 | Metric | Result |
 |---|---|

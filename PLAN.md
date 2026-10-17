@@ -28,3 +28,6 @@ As specified in the build prompt §4 (monorepo `backend/` FastAPI + `frontend/` 
 - Docker not installed on dev machine → compose files written but unverified locally (flagged in final report).
 - Budget exhaustion on public demo → DEMO_MODE + replay.
 - Dev git root: repo is initialised inside the project dir (the home dir is itself a git repo).
+
+## Status (2026-10-17)
+P0-P8 implemented and committed. 402 backend tests, 4 Playwright tests, ruff/mypy/eslint/tsc clean. Not done / needs keys or other machines: live Token Factory/Tavily/Telegram verification, Docker run, gitleaks run, screenshots + video. See `docs/FINAL_AUDIT.md`.

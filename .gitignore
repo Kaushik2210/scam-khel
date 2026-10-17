@@ -20,3 +20,4 @@ playwright-report/
 .claude/settings.local.json
 frontend/*.tsbuildinfo
 backend/data/
+frontend/next-env.d.ts

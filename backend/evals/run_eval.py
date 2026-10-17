@@ -10,6 +10,7 @@ import argparse
 import asyncio
 import json
 import statistics
+import sys
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -301,6 +302,7 @@ async def main(live: bool) -> None:
         if START in txt and END in txt:
             a, b = txt.index(START), txt.index(END)
             README.write_text(txt[:a] + START + "\n" + table + "\n" + txt[b:], encoding="utf-8")
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     print(report)
 
 
