@@ -262,3 +262,18 @@ def has_money_request(text: str) -> bool:
         if not _PRE_NEG.search(text[max(0, m.start() - 24) : m.start()]):
             return True
     return False
+
+
+# Public-awareness / advisory text ("beware of digital arrest scams ...") quotes scam vocabulary
+# to warn about it. Cues are deliberately specific.
+_AWARENESS = re.compile(
+    r"\b(beware of|public advisory|awareness|be aware|stay alert|do not fall for|don'?t fall for"
+    r"|scam alert|fraud alert|if you receive such a call|never (?:arrest|ask|asks|demand))\b"
+    r"|\b(?:dial|call) 1930\b|cybercrime\.gov\.in|सावधान|जागरूक",
+    re.IGNORECASE | re.UNICODE,
+)
+DEMAND_TACTICS = NEGATION_SENSITIVE  # un-negated demands (otp, documents, links, money...)
+
+
+def is_awareness(text: str) -> bool:
+    return bool(_AWARENESS.search(text))

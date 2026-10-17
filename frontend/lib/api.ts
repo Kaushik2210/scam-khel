@@ -21,6 +21,12 @@ function safeSet(k: string, v: string) {
 let memoryId: string | null = null;
 export function clientId(): string {
   if (typeof window === "undefined") return "ssr-placeholder";
+  // ?client=<id> lets the demo script open the app as the seeded demo user
+  const fromUrl = new URLSearchParams(window.location.search).get("client");
+  if (fromUrl && /^[A-Za-z0-9-]{8,64}$/.test(fromUrl)) {
+    safeSet(CID_KEY, fromUrl);
+    memoryId = fromUrl;
+  }
   let id = memoryId ?? safeGet(CID_KEY);
   if (!id) {
     id = crypto.randomUUID();

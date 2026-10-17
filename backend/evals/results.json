@@ -1,0 +1,293 @@
+{
+ "mode": "offline (rules + scripted fallbacks, no LLM)",
+ "detection": {
+  "overall": {
+   "n": 43,
+   "scam": 26,
+   "legit": 17,
+   "tp": 25,
+   "fp": 0,
+   "fn": 1,
+   "precision": 1.0,
+   "recall": 0.962,
+   "f1": 0.98,
+   "fp_rate_legit": 0.0,
+   "mean_turns_to_detect": 2.32,
+   "critical_by_payment_rate": 0.885
+  },
+  "tuned_set": {
+   "n": 22,
+   "scam": 14,
+   "legit": 8,
+   "tp": 14,
+   "fp": 0,
+   "fn": 0,
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "fp_rate_legit": 0.0,
+   "mean_turns_to_detect": 2.29,
+   "critical_by_payment_rate": 1.0
+  },
+  "held_out_set": {
+   "n": 21,
+   "scam": 12,
+   "legit": 9,
+   "tp": 11,
+   "fp": 0,
+   "fn": 1,
+   "precision": 1.0,
+   "recall": 0.917,
+   "f1": 0.957,
+   "fp_rate_legit": 0.0,
+   "mean_turns_to_detect": 2.36,
+   "critical_by_payment_rate": 0.75
+  },
+  "by_language": {
+   "en": {
+    "n": 24,
+    "scam": 13,
+    "legit": 11,
+    "tp": 13,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fp_rate_legit": 0.0,
+    "mean_turns_to_detect": 2.54,
+    "critical_by_payment_rate": 0.846
+   },
+   "hi": {
+    "n": 5,
+    "scam": 4,
+    "legit": 1,
+    "tp": 4,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fp_rate_legit": 0.0,
+    "mean_turns_to_detect": 2,
+    "critical_by_payment_rate": 1.0
+   },
+   "hinglish": {
+    "n": 14,
+    "scam": 9,
+    "legit": 5,
+    "tp": 8,
+    "fp": 0,
+    "fn": 1,
+    "precision": 1.0,
+    "recall": 0.889,
+    "f1": 0.941,
+    "fp_rate_legit": 0.0,
+    "mean_turns_to_detect": 2.12,
+    "critical_by_payment_rate": 0.889
+   }
+  },
+  "errors": [
+   {
+    "id": "ev-scam-05-electricity-hinglish",
+    "set": "held-out",
+    "label": "scam",
+    "language": "hinglish",
+    "peak": 51,
+    "pred_scam": false,
+    "turns_to_detect": null,
+    "critical_by_payment": false
+   },
+   {
+    "id": "ev-scam-06-remote-refund",
+    "set": "held-out",
+    "label": "scam",
+    "language": "en",
+    "peak": 78,
+    "pred_scam": true,
+    "turns_to_detect": 3,
+    "critical_by_payment": false
+   },
+   {
+    "id": "ev-scam-07-lottery",
+    "set": "held-out",
+    "label": "scam",
+    "language": "en",
+    "peak": 73,
+    "pred_scam": true,
+    "turns_to_detect": 2,
+    "critical_by_payment": false
+   }
+  ]
+ },
+ "honeypot": {
+  "scenarios": [
+   {
+    "scenario": "adversarial-injection",
+    "engaged_turns": 10,
+    "time_wasted_s": 437,
+    "identifier_types": 5,
+    "identifiers": 5,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 5,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "courier-drug-package",
+    "engaged_turns": 11,
+    "time_wasted_s": 458,
+    "identifier_types": 8,
+    "identifiers": 8,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "digital-arrest-money-laundering",
+    "engaged_turns": 12,
+    "time_wasted_s": 525,
+    "identifier_types": 7,
+    "identifiers": 7,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "digital-arrest-parcel",
+    "engaged_turns": 12,
+    "time_wasted_s": 530,
+    "identifier_types": 8,
+    "identifiers": 8,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "fake-customs",
+    "engaged_turns": 9,
+    "time_wasted_s": 404,
+    "identifier_types": 10,
+    "identifiers": 10,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "fake-police-family-accident",
+    "engaged_turns": 9,
+    "time_wasted_s": 373,
+    "identifier_types": 8,
+    "identifiers": 8,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   },
+   {
+    "scenario": "kyc-expiry-bank",
+    "engaged_turns": 8,
+    "time_wasted_s": 337,
+    "identifier_types": 7,
+    "identifiers": 7,
+    "leaks": 0,
+    "guard_rewrites": 0,
+    "injections": 0,
+    "ended": "scammer_disengaged"
+   }
+  ],
+  "sessions": 7,
+  "mean_engaged_turns": 10.1,
+  "mean_time_wasted_s": 438,
+  "mean_identifier_types": 7.6,
+  "mean_identifiers": 7.6,
+  "persona_leakage_rate": 0.0,
+  "guard_rewrites_total": 0,
+  "memory": [
+   {
+    "scenario": "adversarial-injection",
+    "first_detect_turn": 2,
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": 2,
+    "benefit": 0
+   },
+   {
+    "scenario": "courier-drug-package",
+    "first_detect_turn": 4,
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": 2,
+    "benefit": 2
+   },
+   {
+    "scenario": "digital-arrest-money-laundering",
+    "first_detect_turn": 4,
+    "second_detect_turn": 3,
+    "second_memory_hit_turn": 3,
+    "benefit": 1
+   },
+   {
+    "scenario": "digital-arrest-parcel",
+    "first_detect_turn": 4,
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": 2,
+    "benefit": 2
+   },
+   {
+    "scenario": "fake-customs",
+    "first_detect_turn": 4,
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": 2,
+    "benefit": 2
+   },
+   {
+    "scenario": "fake-police-family-accident",
+    "first_detect_turn": 2,
+    "second_detect_turn": 1,
+    "second_memory_hit_turn": 1,
+    "benefit": 1
+   },
+   {
+    "scenario": "kyc-expiry-bank",
+    "first_detect_turn": 4,
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": 2,
+    "benefit": 2
+   }
+  ],
+  "memory_mean_turns_saved": 1.43
+ },
+ "usage": {
+  "by_tier": {
+   "fast": {
+    "calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "latency_p50_ms": null,
+    "latency_p95_ms": null,
+    "models": []
+   },
+   "mid": {
+    "calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "latency_p50_ms": null,
+    "latency_p95_ms": null,
+    "models": []
+   },
+   "deep": {
+    "calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "latency_p50_ms": null,
+    "latency_p95_ms": null,
+    "models": []
+   },
+   "total_tokens": 0
+  },
+  "note": "Offline run: no LLM calls, so no tokens or latency. Run `make eval-live` with a Token Factory key to fill this table."
+ }
+}

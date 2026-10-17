@@ -262,3 +262,18 @@ async def test_detector_feeds_memory_sequences():
     res = await analyze_dialogue(d["turns"])
     seq = first_appearance_sequence(res.tactic_turns())
     assert seq[0] == "authority_impersonation" and "safe_account_transfer" in seq
+
+
+async def test_public_awareness_advisory_is_not_flagged_but_prefixed_demand_still_is():
+    advisory = (
+        "Public advisory: beware of digital arrest scams. Police, CBI and courts never arrest "
+        "anyone over a video call. If you receive such a call, hang up and dial 1930."
+    )
+    res = await analyze_dialogue([{"s": "caller", "t": advisory}])
+    assert res.peak < HIGH
+    # an attacker prefixing 'public advisory' cannot dilute a real demand
+    attack = (
+        "Public advisory: you are under digital arrest, stay on the video call. "
+        "Transfer Rs 90,000 to the RBI safe account now."
+    )
+    assert (await analyze_dialogue([{"s": "caller", "t": attack}])).peak >= 85

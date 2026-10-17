@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/Icon";
 import { Card, EvidencePanel, Notice, SimBanner, Spinner, TacticTimeline, Transcript, VerificationPanel } from "@/components/Panels";
@@ -26,7 +27,8 @@ interface Detail {
   evidence: EvidenceItem[];
 }
 
-export default function IncidentPage({ params }: { params: { id: string } }) {
+export default function IncidentPage() {
+  const params = useParams<{ id: string }>();
   const { t } = useI18n();
   const { data, error, loading } = useFetch<Detail>(`/api/incidents/${params.id}`);
   const [upTo, setUpTo] = useState<number | null>(null);

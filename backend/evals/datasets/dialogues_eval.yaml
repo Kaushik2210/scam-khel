@@ -1,0 +1,206 @@
+# Held-out eval dialogues, written AFTER the rules were tuned on dialogues_p1.yaml, with more
+# paraphrase and harder legit cases. All agencies/names/numbers are fictional.
+# payment_turn: 0-based index of first explicit payment demand (scams).
+
+- id: ev-scam-01-mumbai-cyber-sim
+  label: scam
+  language: en
+  scenario: sim-misuse
+  payment_turn: 4
+  turns:
+    - {s: caller, t: "Sir, I am calling from the Mumbai Cyber Police desk (SIMULATION). A SIM card issued on your ID was used to send threatening messages."}
+    - {s: victim, t: "That cannot be true."}
+    - {s: caller, t: "We need to verify you. Stay on this video call until my senior officer joins."}
+    - {s: victim, t: "How long will it take?"}
+    - {s: caller, t: "Do not discuss this with relatives, it is an ongoing investigation. To prove your savings are clean, move them to the RBI supervised verification account today."}
+
+- id: ev-scam-02-ed-notice
+  label: scam
+  language: en
+  scenario: ed-notice
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "Enforcement Directorate verification cell (SIMULATION). Your PAN is attached to a hawala case, case ref ED-55821."}
+    - {s: victim, t: "I have done nothing wrong."}
+    - {s: caller, t: "Then co-operate. Do not tell anyone, not even your lawyer, or we will have to arrest you tonight."}
+    - {s: caller, t: "Transfer Rs 4,20,000 to the secure account we give you, it will be returned after the audit."}
+
+- id: ev-scam-03-courier-hinglish
+  label: scam
+  language: hinglish
+  scenario: courier-drug-package
+  payment_turn: 4
+  turns:
+    - {s: caller, t: "Hello, courier company se bol rahe hain. Aapke naam ka parcel Mumbai airport par roka gaya hai, usme MDMA mila hai."}
+    - {s: victim, t: "Kya? Maine kuch nahi bheja."}
+    - {s: caller, t: "Cyber crime police se baat karwata hoon. Aap video call par rahiye, call kaatna mat."}
+    - {s: victim, t: "Theek hai."}
+    - {s: caller, t: "Case close karne ke liye abhi 85,000 rupay is account mein transfer karo, warna giraftari hogi."}
+
+- id: ev-scam-04-income-tax-hindi
+  label: scam
+  language: hi
+  scenario: income-tax
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "मैं आयकर विभाग से अधिकारी बोल रहा हूँ (SIMULATION)। आपके खाते में बड़ी चोरी पकड़ी गई है, वारंट जारी होने वाला है।"}
+    - {s: victim, t: "मुझे कुछ पता नहीं।"}
+    - {s: caller, t: "किसी को मत बताइए और अपना आधार नंबर भेजिए।"}
+    - {s: caller, t: "तुरंत 70,000 रुपये जुर्माना जमा करें वरना गिरफ्तारी होगी।"}
+
+- id: ev-scam-05-electricity-hinglish
+  label: scam
+  language: hinglish
+  scenario: electricity
+  payment_turn: 2
+  turns:
+    - {s: caller, t: "Bijli vibhag se bol rahe hain. Aapka bill pending hai, aaj raat 9 baje connection kat jayega."}
+    - {s: victim, t: "Lekin maine bill bhar diya tha."}
+    - {s: caller, t: "Is link par click kijiye http://bill-fix.example.test/pay aur turant 4,500 rupay transfer karo."}
+
+- id: ev-scam-06-remote-refund
+  label: scam
+  language: en
+  scenario: refund
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "Good afternoon, customer support here (SIMULATION). We owe you a refund of Rs 3,200 but it needs verification."}
+    - {s: victim, t: "Okay, what do I do?"}
+    - {s: caller, t: "Please install AnyDesk from the store and read me the nine digit code on screen."}
+    - {s: caller, t: "Now share the OTP that arrived and transfer Rs 1 to the account I will send to activate the refund."}
+
+- id: ev-scam-07-lottery
+  label: scam
+  language: en
+  scenario: lottery
+  payment_turn: 2
+  turns:
+    - {s: caller, t: "Congratulations, you have won a Rs 25 lakh prize in our lucky draw (SIMULATION)!"}
+    - {s: victim, t: "Really? How do I claim it?"}
+    - {s: caller, t: "Pay a processing fee of Rs 12,500 within 2 hours to release the amount, and keep this confidential."}
+
+- id: ev-scam-08-aadhaar-suspension
+  label: scam
+  language: hinglish
+  scenario: aadhaar
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "UIDAI officer bol raha hoon (SIMULATION). Aapka Aadhaar suspend hone wala hai, aap par fraud ka case hai."}
+    - {s: victim, t: "Main kya karun?"}
+    - {s: caller, t: "Apna Aadhaar number aur OTP bataiye, kisi ko mat batana."}
+    - {s: caller, t: "Aur turant 6,000 rupay jurmana jama karo."}
+
+- id: ev-scam-09-grandson-accident
+  label: scam
+  language: en
+  scenario: family-accident
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "Hello, is this the grandmother? Your grandson has been detained after a road accident, I am the police inspector (SIMULATION)."}
+    - {s: victim, t: "Oh no, is he alright?"}
+    - {s: caller, t: "He is in custody. Please do not tell anyone in the family, it will make things worse."}
+    - {s: caller, t: "Send Rs 55,000 immediately as bail to this UPI ID."}
+
+- id: ev-scam-10-trai-sim
+  label: scam
+  language: hinglish
+  scenario: trai
+  payment_turn: 4
+  turns:
+    - {s: caller, t: "TRAI se bol raha hoon (SIMULATION). Aapke number se illegal calls ho rahi hain, number band hoga."}
+    - {s: victim, t: "Kaun sa number?"}
+    - {s: caller, t: "Police ko connect kar raha hoon. Video call par rahiye aur camera on rakho."}
+    - {s: victim, t: "Ji."}
+    - {s: caller, t: "Verification ke liye 25,000 rupay safe account mein bhejo, abhi."}
+
+- id: ev-scam-11-bank-fraud-team
+  label: scam
+  language: en
+  scenario: bank-fraud
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "This is the fraud department of your bank (SIMULATION). Someone is trying to empty your account right now, we must act immediately."}
+    - {s: victim, t: "What should I do?"}
+    - {s: caller, t: "Tell me the PIN and the OTP on your phone so we can block the attacker."}
+    - {s: caller, t: "Then move your balance to a safe account to protect it, I will give you the number."}
+
+- id: ev-scam-12-parcel-hindi-camera
+  label: scam
+  language: hi
+  scenario: digital-arrest-parcel
+  payment_turn: 3
+  turns:
+    - {s: caller, t: "मैं सीबीआई अधिकारी बोल रहा हूँ (SIMULATION)। आपके नाम पर पार्सल में अवैध सामान मिला है।"}
+    - {s: victim, t: "मैंने कुछ नहीं भेजा।"}
+    - {s: caller, t: "आप डिजिटल अरेस्ट में हैं। कैमरा ऑन रखिए और किसी को मत बताइए।"}
+    - {s: caller, t: "तुरंत 2,00,000 रुपये सुरक्षित खाते में ट्रांसफर करें।"}
+
+- id: ev-legit-01-police-complaint-ack
+  label: legit
+  language: en
+  scenario: police-ack
+  turns:
+    - {s: caller, t: "Good morning, this is the cyber police station. We have registered your complaint about the lost wallet. Your complaint number is 2291."}
+    - {s: victim, t: "Thank you, what next?"}
+    - {s: caller, t: "Please visit the station with your ID proof at your convenience this week and meet the duty officer."}
+
+- id: ev-legit-02-bank-fraud-alert
+  label: legit
+  language: en
+  scenario: bank-alert
+  turns:
+    - {s: caller, t: "Example Bank alert: a card payment of Rs 8,900 was attempted at an online store. If this was not you, block your card in the official app or call the number on your card. We never ask for your OTP, PIN or CVV."}
+
+- id: ev-legit-03-delivery-otp
+  label: legit
+  language: hinglish
+  scenario: courier
+  turns:
+    - {s: caller, t: "Namaste, delivery boy bol raha hoon. Aapka parcel 20 minute mein pahunch jayega."}
+    - {s: victim, t: "Theek hai, main ghar par hoon."}
+    - {s: caller, t: "Delivery ke waqt jo OTP aapke phone par aaya hai woh darwaze par mujhe bata dijiye."}
+
+- id: ev-legit-04-income-tax-refund
+  label: legit
+  language: en
+  scenario: tax-refund
+  turns:
+    - {s: caller, t: "Income Tax Department: your refund of Rs 4,300 for the assessment year has been processed and will be credited to your registered bank account in 7 days."}
+
+- id: ev-legit-05-rent-family
+  label: legit
+  language: hinglish
+  scenario: family
+  turns:
+    - {s: caller, t: "Beta, is mahine ka kiraya 12000 rupay bhej dena, makaan malik ne yaad dilaya hai."}
+    - {s: victim, t: "Ji mummy, shaam ko bhej dunga."}
+
+- id: ev-legit-06-insurance-premium
+  label: legit
+  language: en
+  scenario: insurance
+  turns:
+    - {s: caller, t: "Hello, this is a reminder from your insurance company. Your premium of Rs 8,400 is due on the 15th. You can pay through the official app or at any branch."}
+    - {s: victim, t: "I will pay online."}
+
+- id: ev-legit-07-school-fee-hindi
+  label: legit
+  language: hi
+  scenario: school
+  turns:
+    - {s: caller, t: "नमस्ते, विद्यालय कार्यालय से बोल रहे हैं। इस तिमाही की फीस 6,500 रुपये है, कृपया 10 तारीख तक काउंटर पर जमा कर दें।"}
+
+- id: ev-legit-08-scam-awareness-message
+  label: legit
+  language: en
+  scenario: awareness
+  turns:
+    - {s: caller, t: "Public advisory: beware of digital arrest scams. Police, CBI and courts never arrest anyone over a video call and never ask you to transfer money to a safe account. If you receive such a call, hang up and dial 1930."}
+
+- id: ev-legit-09-emi-collection-hinglish
+  label: legit
+  language: hinglish
+  scenario: emi
+  turns:
+    - {s: caller, t: "Namaste, bank se bol rahe hain. Aapki EMI 3,200 rupay ki aaj due hai, nahi bhari toh late fee lagega. App se pay kar dijiye."}
+    - {s: victim, t: "Main abhi bhar deta hoon."}

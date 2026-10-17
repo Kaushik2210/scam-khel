@@ -1,4 +1,4 @@
-.PHONY: setup dev test lint eval seed demo check-models purge
+.PHONY: setup dev test lint eval eval-live seed demo check-models purge e2e up
 PY ?= python
 
 setup:
@@ -19,10 +19,20 @@ check-models:
 eval:
 	cd backend && $(PY) evals/run_eval.py
 
+eval-live:
+	cd backend && $(PY) evals/run_eval.py --live
+
+e2e:
+	cd frontend && npx playwright test
+
+up:
+	docker compose up --build
+
 seed:
 	cd backend && $(PY) scripts/seed_demo.py
 
-demo: seed
+demo:
+	cd backend && $(PY) scripts/seed_demo.py --reset
 
 purge:
 	cd backend && $(PY) scripts/purge.py

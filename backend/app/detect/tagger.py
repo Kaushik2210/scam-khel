@@ -7,7 +7,13 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.detect.injection import neutralise, screen, wrap_untrusted
-from app.detect.rules import TacticHit, detect_rules, has_money_request
+from app.detect.rules import (
+    DEMAND_TACTICS,
+    TacticHit,
+    detect_rules,
+    has_money_request,
+    is_awareness,
+)
 from app.detect.sanitizer import sanitize
 from app.detect.taxonomy import TACTICS, is_valid_tactic
 from app.llm.client import LLMClient, LLMError
@@ -131,6 +137,13 @@ async def tag_utterance(
         log.warning("injection_detected", reasons=inj.reasons)
         # keep rule hits from the *neutralised* text so injected text can't suppress/forge tactics
         merged = _from_rules(detect_rules(neutralise(text)))
+    if is_awareness(text) and not money and not (set(merged) & DEMAND_TACTICS):
+        # A public advisory quoting scam vocabulary, with no live demand: dampen below scoring.
+        merged = {
+            k: v.model_copy(update={"confidence": round(v.confidence * 0.4, 2)})
+            for k, v in merged.items()
+        }
+        log.info("awareness_context_dampened")
     tactics = list(merged.values())
     return Tagged(
         tactics=tactics,
