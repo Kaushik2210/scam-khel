@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRequireConsent } from "@/components/Consent";
 import { Icon } from "@/components/Icon";
+import { MicButton } from "@/components/MicButton";
 import {
   AlertsCard,
   EvidencePanel,
@@ -64,6 +65,7 @@ export default function Live() {
           data-testid="paste"
         />
         <div className="flex flex-wrap gap-2">
+          <MicButton onText={(x) => setText((p) => (p ? `${p}\n` : "") + x)} />
           <button type="button" className="btn-primary" onClick={analyze} disabled={!text.trim()} data-testid="analyze">
             <Icon name="shield" /> {state.status === "running" ? t("live.add") : t("live.analyze")}
           </button>

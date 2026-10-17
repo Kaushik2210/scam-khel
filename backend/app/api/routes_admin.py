@@ -7,8 +7,15 @@ from fastapi import APIRouter, Header, HTTPException, Request
 
 from app.api.state import get_state
 from app.guards.demo_mode import list_replays
+from app.voice.asr import voice_status
 
 router = APIRouter()
+
+
+@router.get("/api/voice/status")
+async def voice(request: Request) -> dict[str, Any]:
+    s = get_state(request).settings
+    return voice_status(s.asr_base_url, s.tts_base_url)
 
 
 @router.get("/healthz")

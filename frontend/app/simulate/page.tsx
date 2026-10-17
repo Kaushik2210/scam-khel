@@ -19,6 +19,7 @@ import {
 } from "@/components/Panels";
 import { download } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
+import { canSpeak, speak, stopSpeaking } from "@/lib/voice";
 import type { Scenario } from "@/lib/types";
 import { useFetch } from "@/lib/useFetch";
 import { useSession } from "@/lib/useSession";
@@ -33,6 +34,16 @@ export default function Simulate() {
   const [speed, setSpeed] = useState(2);
   const [reply, setReply] = useState("");
   const [dlError, setDlError] = useState<string | null>(null);
+  const [aloud, setAloud] = useState(false);
+  const [canTalk, setCanTalk] = useState(false);
+  useEffect(() => setCanTalk(canSpeak()), []);
+  const lastPersona = [...state.transcript].reverse().find((l) => l.speaker === "persona");
+  const spokenCount = state.transcript.filter((l) => l.speaker === "persona").length;
+  useEffect(() => {
+    if (aloud && lastPersona) speak(lastPersona.text, "en");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spokenCount, aloud]);
+  useEffect(() => (aloud ? undefined : void stopSpeaking()), [aloud]);
 
   useEffect(() => {
     if (scen.data && !scen.data.some((s) => s.id === scenario)) setScenario(scen.data[0]?.id ?? scenario);
@@ -96,6 +107,12 @@ export default function Simulate() {
               </label>
             ))}
           </div>
+          {canTalk && (
+            <label className="mt-1 flex min-h-tap items-center gap-2 text-callout">
+              <input type="checkbox" className="h-5 w-5 accent-[var(--tint)]" checked={aloud} onChange={(e) => setAloud(e.target.checked)} />
+              {t("voice.readAloud")}
+            </label>
+          )}
           {!manual && (
             <label className="mt-1 flex items-center gap-2 text-callout">
               {t("sim.speed")}

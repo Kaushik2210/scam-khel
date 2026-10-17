@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./data/scamkhel.db"
     retention_days: int = 30
 
+    asr_base_url: str = (
+        ""  # optional NVIDIA ASR endpoint (OpenAI-compatible); unset = browser fallback
+    )
+    tts_base_url: str = ""
     demo_mode: bool = False
     daily_token_budget: int = 500_000
     per_ip_sessions_per_hour: int = 6

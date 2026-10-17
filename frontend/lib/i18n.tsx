@@ -156,6 +156,9 @@ const en = {
   "more.deleteBody": "This removes your incidents, transcripts, evidence and family circle from this server. It cannot be undone.",
   "more.deleted": "All your data was deleted.",
   "more.models": "Model status",
+  "voice.mic": "Speak",
+  "voice.listening": "Listening… tap to stop",
+  "voice.readAloud": "Read replies aloud",
 } as const;
 
 export type Key = keyof typeof en;
@@ -313,6 +316,9 @@ const hi: Record<Key, string> = {
   "more.deleteBody": "इससे आपकी घटनाएँ, ट्रांसक्रिप्ट, सबूत और परिवार का घेरा इस सर्वर से हट जाएँगे। इसे वापस नहीं किया जा सकता।",
   "more.deleted": "आपका सारा डेटा मिटा दिया गया।",
   "more.models": "मॉडल की स्थिति",
+  "voice.mic": "बोलें",
+  "voice.listening": "सुन रहा है… रोकने के लिए दबाएँ",
+  "voice.readAloud": "जवाब बोलकर सुनाएँ",
 };
 
 const dicts: Record<Lang, Record<Key, string>> = { en, hi };
