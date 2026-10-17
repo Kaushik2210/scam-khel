@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.gif binary
+backend/evals/results.json linguist-generated=true
+backend/app/replays/*.json linguist-generated=true
+frontend/package-lock.json linguist-generated=true

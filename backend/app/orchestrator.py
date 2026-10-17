@@ -91,8 +91,10 @@ class Orchestrator:
         seed: int = 0,
         persona_config: PersonaConfig | None = None,
         verifier: TavilyVerifier | None = None,
+        language: str | None = None,
     ) -> None:
         self.verifier = verifier
+        self.language = language  # UI language; explanations follow the user, not the caller
         self.llm, self.db, self.cipher = llm, db, cipher
         self.emit = emit or _noop_emit
         self.alert_hook = alert_hook
@@ -202,7 +204,7 @@ class Orchestrator:
                 "risk",
                 {
                     "turn": n,
-                    **explain(st, guess_language(turn.text)),
+                    **explain(st, self.language or guess_language(turn.text)),
                     "stage": st.stage,
                     "active_tactics": active,
                 },

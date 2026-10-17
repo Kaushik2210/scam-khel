@@ -1,0 +1,36 @@
+name: Bug report
+description: Something is broken, or a call was mis-scored
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: For a mis-scored call, paste synthetic or fully redacted text only. Never paste real personal data.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Detection / risk score
+        - Honeypot persona
+        - Simulator
+        - Memory
+        - Evidence / Tavily
+        - Complaint / PDF
+        - Telegram alerts
+        - Frontend UI
+        - Docs
+        - Other
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, browser, offline or live LLM mode

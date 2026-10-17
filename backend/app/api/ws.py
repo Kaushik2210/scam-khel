@@ -215,6 +215,7 @@ async def _run_orchestrator(
             alert_hook=make_alert_hook(st, user.id, ch.send, True),
             user_id=user.id,
             verifier=st.verifier,
+            language=live.language,
         )
 
         async def victim() -> str | None:

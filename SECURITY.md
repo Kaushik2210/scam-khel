@@ -1,7 +1,7 @@
 # Security
 
 ## Reporting
-Open a private security advisory on the repository, or email the maintainer. Please do not file public issues for vulnerabilities.
+Use [GitHub private vulnerability reporting](https://github.com/Kaushik2210/scam-khel/security/advisories/new) (preferred), or contact the maintainer through their GitHub profile. Please do not file public issues for vulnerabilities.
 
 ## Controls implemented (and tested)
 | Area | Control | Where / test |

@@ -103,7 +103,9 @@ class ShieldAnalyzer:
                 await self.emit("memory_hit", r.memory_hit)
         r.score, r.level, r.stage = st.score, st.level, st.stage
         r.tactics = [t.id for t in active_tactics(st)]
-        r.explanation = explain(st, guess_language(text))
+        r.explanation = explain(
+            st, self.language if self.language in ("en", "hi") else guess_language(text)
+        )
         if r.detect_turn is None and st.score >= HIGH:
             r.detect_turn = n
         r.timeline.append({"turn": n, "stage": st.stage, "tactics": r.tactics, "risk": st.score})

@@ -298,3 +298,15 @@ def test_budget_exhaustion_serves_labelled_replay_no_blank_screen(tmp_path):
         )
         assert r.status_code == 200
         assert [x["id"] for x in c.get("/api/replays").json()]
+
+
+def test_explanation_follows_ui_language_not_caller_language(client):
+    text = "Main CBI officer hoon. Aap digital arrest mein hain, kisi ko mat batana."
+    en = client.post(
+        "/api/analyze", headers=H, json={"text": text, "language": "en", "consent": True}
+    ).json()
+    hi = client.post(
+        "/api/analyze", headers=H, json={"text": text, "language": "hi", "consent": True}
+    ).json()
+    assert en["explanation"]["summary"].isascii()
+    assert not hi["explanation"]["summary"].isascii()
