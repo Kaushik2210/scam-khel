@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     max_turns_per_session: int = 20
     admin_token: str = ""
     frontend_origin: str = "http://localhost:3000"
+    # Number of reverse proxies in front of the API that append to X-Forwarded-For.
+    # 0 (default) means the header is ignored and the socket peer address is used, so a
+    # client cannot dodge the per-IP limits by sending its own header.
+    trusted_proxy_hops: int = 0
 
     def model_for(self, tier: Tier) -> str:
         return {"fast": self.model_fast, "mid": self.model_mid, "deep": self.model_deep}[tier]

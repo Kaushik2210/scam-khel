@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import re
+import secrets
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -38,6 +39,9 @@ class LiveSession:
     inbox: asyncio.Queue[str | None] = field(default_factory=asyncio.Queue)
     started: bool = False
     summary: dict[str, Any] | None = None
+    # Bearer for the websocket of this one session. It keeps the long-lived client ID
+    # out of the websocket URL (and so out of access logs).
+    ticket: str = field(default_factory=lambda: secrets.token_urlsafe(24))
 
 
 @dataclass
@@ -77,8 +81,21 @@ def get_state(request: Request) -> AppState:
 
 
 def client_ip(request: Request) -> str:
-    fwd = request.headers.get("x-forwarded-for", "")
-    return fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "?")
+    """The caller's address for rate limiting.
+
+    X-Forwarded-For is client-controlled unless a trusted proxy rewrote it, so it is only
+    read when `trusted_proxy_hops` says how many proxies append to it. The entry that many
+    hops from the right is the one our own outermost proxy saw; anything to its left is
+    whatever the client claimed.
+    """
+    peer = request.client.host if request.client else "?"
+    hops = get_state(request).settings.trusted_proxy_hops
+    if hops > 0:
+        parts = [p.strip() for p in request.headers.get("x-forwarded-for", "").split(",")]
+        parts = [p for p in parts if p]
+        if len(parts) >= hops:
+            return parts[-hops]
+    return peer
 
 
 async def user_for_client(db: AsyncSession, client_id: str) -> User:

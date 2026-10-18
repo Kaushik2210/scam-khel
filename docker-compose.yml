@@ -16,6 +16,8 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8000
+        # Demo only (needed for ?client=demo-client-0001). Never set this for real users.
+        NEXT_PUBLIC_ALLOW_CLIENT_PARAM: ${NEXT_PUBLIC_ALLOW_CLIENT_PARAM:-}
     depends_on: [backend]
     ports: ["3000:3000"]
     restart: unless-stopped

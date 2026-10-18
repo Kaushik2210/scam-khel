@@ -104,9 +104,9 @@ make demo                       # seeds two prior incidents so the memory-hit mo
 make dev                        # API on :8000   (second terminal: cd frontend && npm run dev)
 ```
 
-Open <http://localhost:3000/?client=demo-client-0001> to see the seeded incidents. Or: `docker compose up --build`.
+Start the frontend with `NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1` (demo only, see `frontend/.env.example`), then open <http://localhost:3000/?client=demo-client-0001> to see the seeded incidents. Or: `docker compose up --build`.
 
-**Deploy:** frontend on Vercel (`NEXT_PUBLIC_API_URL` = your API URL); backend container (`backend/Dockerfile`) on Render / Fly / Railway with a persistent volume at `/data`, `DEMO_MODE=true`, `FRONTEND_ORIGIN` = the Vercel URL, `ADMIN_TOKEN` and `FERNET_KEY` set. Details in [docs/MANUAL_STEPS.md](docs/MANUAL_STEPS.md).
+**Deploy:** frontend on Vercel (`NEXT_PUBLIC_API_URL` = your API URL); backend container (`backend/Dockerfile`) on Render / Fly / Railway with a persistent volume at `/data`, `DEMO_MODE=true`, `FRONTEND_ORIGIN` = the Vercel URL, `ADMIN_TOKEN` and `FERNET_KEY` set, and `TRUSTED_PROXY_HOPS=1` (the host's proxy sets `X-Forwarded-For`; without it every visitor shares the proxy's address and the per-IP limits apply to everyone together). Details in [docs/MANUAL_STEPS.md](docs/MANUAL_STEPS.md).
 
 ### Environment variables
 

@@ -36,7 +36,7 @@ cd frontend && npm install && cd ..
 make demo                            # reset + seed two prior incidents (offline)
 make dev                             # API :8000 (new terminal) -> cd frontend && npm run dev   (UI :3000)
 ```
-Open http://localhost:3000/?client=demo-client-0001.
+Start the frontend with `NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1`, then open http://localhost:3000/?client=demo-client-0001.
 
 | Command | Purpose |
 |---|---|
@@ -207,7 +207,7 @@ Sequence: A and C start P0 in parallel on day 1 (A needs keys, C needs Docker); 
 - **Tests start servers:** Playwright reuses an existing server on :8000/:3000. A stale backend started earlier will not have new routes; kill ports 8000/3000 before e2e.
 - **App is a factory:** `uvicorn app.main:create_app --factory`. No import-time side effects.
 - **Fernet key:** if `FERNET_KEY` is unset the backend generates `backend/data/.fernet_key` (gitignored). Losing it makes stored transcripts unreadable.
-- **`?client=<id>`** in the URL sets the client identity (used by the demo seed: `demo-client-0001`).
+- **`?client=<id>`** sets the client identity only in builds with `NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1` (demo seed: `demo-client-0001`). Keep it off for real users: the client id is the only credential.
 - **Alembic:** FTS5 tables (`script_fts*`) are excluded from autogenerate on purpose; the migration creates them by hand.
 - **Theme:** `<html data-theme>` is set by an inline script before paint (`frontend/lib/theme.tsx`); light is the default.
 - **Next.js 16 / React 19 / ESLint 9 flat config** (not Next 14 as in the original spec; Next 14 had unfixed advisories). `react-hooks/set-state-in-effect` is intentionally off.

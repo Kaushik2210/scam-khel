@@ -47,6 +47,15 @@ async def add_family(body: FamilyIn, ctx: UserDep = Depends(current_user)) -> di
     return {"id": m.id, "label": m.label, "join_code": m.join_code}
 
 
+@router.delete("/api/family/{member_id}")
+async def remove_family(member_id: int, ctx: UserDep = Depends(current_user)) -> dict[str, bool]:
+    st, user = ctx
+    async with st.sm() as db:
+        if not await repo.delete_family_member(db, user.id, member_id):
+            raise HTTPException(404, "not found")
+    return {"deleted": True}
+
+
 @router.post("/api/family/test-alert")
 async def test_alert(ctx: UserDep = Depends(current_user)) -> dict[str, Any]:
     st, user = ctx
@@ -75,5 +84,5 @@ async def webhook(
         raise HTTPException(403, "forbidden")
     update = await request.json()
     async with st.sm() as db:
-        await handle_update(update, db, st.telegram)
+        await handle_update(update, db, st.telegram, st.limiter)
     return {"ok": True}

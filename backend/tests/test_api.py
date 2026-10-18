@@ -151,7 +151,7 @@ def test_second_analyze_hits_memory(client):
 def test_family_flow_and_admin_usage_protected(client):
     assert client.get("/api/family", headers=H).json()["members"] == []
     m = client.post("/api/family", json={"label": "FAMILY_1"}, headers=H).json()
-    assert len(m["join_code"]) == 8
+    assert len(m["join_code"]) == 10
     assert client.get("/api/family", headers=H).json()["members"][0]["linked"] is False
     assert client.post("/api/family/test-alert", headers=H).status_code == 503  # no bot token
     assert client.get("/api/admin/usage").status_code == 403
@@ -159,6 +159,16 @@ def test_family_flow_and_admin_usage_protected(client):
     u = client.get("/api/admin/usage", headers={"X-Admin-Token": "adm-secret"}).json()
     assert set(u["by_tier"]) >= {"fast", "mid", "deep"}
     assert client.post("/api/telegram/webhook", json={}).status_code == 403
+
+
+def test_family_member_can_be_removed_only_by_its_owner(client):
+    m = client.post("/api/family", json={"label": "FAMILY_1"}, headers=H).json()
+    other = {"X-Client-Id": "client-1111-bbbb"}
+    assert client.delete(f"/api/family/{m['id']}", headers=other).status_code == 404
+    assert len(client.get("/api/family", headers=H).json()["members"]) == 1
+    assert client.delete(f"/api/family/{m['id']}", headers=H).json() == {"deleted": True}
+    assert client.get("/api/family", headers=H).json()["members"] == []
+    assert client.delete(f"/api/family/{m['id']}", headers=H).status_code == 404
 
 
 def test_panic_endpoint(client):
@@ -203,7 +213,7 @@ def test_ws_honeypot_autoplay_end_to_end(client):
             "consent": True,
         },
     ).json()
-    with client.websocket_connect(f"/ws/sessions/{s['id']}?client_id={CID}") as ws:
+    with client.websocket_connect(f"/ws/sessions/{s['id']}?ticket={s['ws_ticket']}") as ws:
         ws.send_json({"type": "control", "action": "start", "speed": 8})
         ev = drain(ws)
     types = {e["type"] for e in ev}
@@ -223,7 +233,7 @@ def test_ws_manual_takeover_and_shield_streaming(client):
         headers=H,
         json={"mode": "manual", "scenario": "fake-customs", "language": "en", "consent": True},
     ).json()
-    with client.websocket_connect(f"/ws/sessions/{s['id']}?client_id={CID}") as ws:
+    with client.websocket_connect(f"/ws/sessions/{s['id']}?ticket={s['ws_ticket']}") as ws:
         ws.send_json({"type": "control", "action": "start", "speed": 8})
         ev = drain(ws, "risk")  # scammer's first line analysed; orchestrator now awaits the victim
         ws.send_json({"type": "utterance", "text": "Who is this?"})
@@ -238,7 +248,7 @@ def test_ws_manual_takeover_and_shield_streaming(client):
         headers=H,
         json={"mode": "shield", "scenario": "x", "language": "en", "consent": True},
     ).json()
-    with client.websocket_connect(f"/ws/sessions/{s2['id']}?client_id={CID}") as ws:
+    with client.websocket_connect(f"/ws/sessions/{s2['id']}?ticket={s2['ws_ticket']}") as ws:
         ws.send_json(
             {"type": "utterance", "text": "You are under digital arrest, do not tell anyone"}
         )
@@ -250,7 +260,7 @@ def test_ws_manual_takeover_and_shield_streaming(client):
     assert e1[-1]["level"] in ("high", "critical") and end[-1]["type"] == "summary"
 
 
-def test_ws_rejects_wrong_client_and_unknown_session(client):
+def test_ws_rejects_wrong_ticket_client_id_and_unknown_session(client):
     s = client.post(
         "/api/sessions",
         headers=H,
@@ -258,14 +268,57 @@ def test_ws_rejects_wrong_client_and_unknown_session(client):
     ).json()
     from starlette.websockets import WebSocketDisconnect
 
+    assert s["ws_ticket"] and s["ws_ticket"] != CID
     for url in (
-        f"/ws/sessions/{s['id']}?client_id=client-9999-bbbb",
-        "/ws/sessions/nope?client_id=" + CID,
+        f"/ws/sessions/{s['id']}?ticket=not-the-ticket",
+        f"/ws/sessions/{s['id']}?ticket=",
+        f"/ws/sessions/{s['id']}?ticket=café",  # non-ASCII must reject, not crash
+        "/ws/sessions/nope?ticket=" + s["ws_ticket"],
+        f"/ws/sessions/{s['id']}?client_id={CID}",  # the long-lived ID is no longer accepted
         f"/ws/sessions/{s['id']}",
     ):
         with pytest.raises(WebSocketDisconnect):
             with client.websocket_connect(url):
                 pass
+
+
+def test_ws_ticket_is_per_session_and_not_the_client_id(client):
+    mk = lambda: client.post(  # noqa: E731
+        "/api/sessions",
+        headers=H,
+        json={"mode": "shield", "scenario": "x", "language": "en", "consent": True},
+    ).json()
+    a, b = mk(), mk()
+    assert a["ws_ticket"] != b["ws_ticket"]
+    from starlette.websockets import WebSocketDisconnect
+
+    with pytest.raises(WebSocketDisconnect):  # session A's ticket does not open session B
+        with client.websocket_connect(f"/ws/sessions/{b['id']}?ticket={a['ws_ticket']}"):
+            pass
+
+
+def _create(c, ip=None):
+    h = {**H, **({"X-Forwarded-For": ip} if ip else {})}
+    return c.post(
+        "/api/sessions",
+        headers=h,
+        json={"mode": "shield", "scenario": "x", "language": "en", "consent": True},
+    )
+
+
+def test_spoofed_forwarded_for_does_not_bypass_rate_limit(tmp_path):
+    with TestClient(make(tmp_path, per_ip_sessions_per_hour=1)) as c:
+        assert _create(c, "1.1.1.1").status_code == 200
+        assert _create(c, "2.2.2.2").status_code == 429  # new XFF value, same socket peer
+
+
+def test_forwarded_for_is_read_only_behind_trusted_proxies(tmp_path):
+    with TestClient(make(tmp_path, per_ip_sessions_per_hour=1, trusted_proxy_hops=1)) as c:
+        # one proxy: the rightmost entry is what that proxy saw; earlier entries are the
+        # client's claim and must not matter
+        assert _create(c, "9.9.9.9, 10.0.0.1").status_code == 200
+        assert _create(c, "8.8.8.8, 10.0.0.1").status_code == 429
+        assert _create(c, "8.8.8.8, 10.0.0.2").status_code == 200  # a different real client
 
 
 def test_budget_exhaustion_serves_labelled_replay_no_blank_screen(tmp_path):
@@ -284,7 +337,7 @@ def test_budget_exhaustion_serves_labelled_replay_no_blank_screen(tmp_path):
         ).json()
         assert s["replay"] is True and "replay" in s["notice"].lower()
         assert c.get("/healthz").json()["budget"]["exhausted"] is True
-        with c.websocket_connect(f"/ws/sessions/{s['id']}?client_id={CID}") as ws:
+        with c.websocket_connect(f"/ws/sessions/{s['id']}?ticket={s['ws_ticket']}") as ws:
             ev = drain(ws)
         assert ev[0]["type"] == "budget_notice" and ev[0]["replay_source"]
         assert all(e.get("replay") for e in ev) and {"persona_reply", "risk"} <= {

@@ -2,7 +2,8 @@
 
 Creates two prior incidents (offline, deterministic) for the demo client so that on camera a
 second, similar run is "Recognised pattern from Incident #N - flagged at turn k vs turn m earlier".
-Open the app once with ?client=demo-client-0001 to see these incidents under Incidents.
+Open the app once with ?client=demo-client-0001 to see these incidents under Incidents
+(start the frontend with NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1; the parameter is off by default).
 
 Usage: python scripts/seed_demo.py [--reset]
 """

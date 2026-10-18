@@ -18,7 +18,7 @@ Use [GitHub private vulnerability reporting](https://github.com/Kaushik2210/scam
 | Logs | PII redaction, no tokens (Telegram token never logged) | `app/logging.py`, `tests/test_p5.py` |
 
 ## Known gaps / accepted risk
-- **Identity model:** a random client ID in `localStorage` identifies a user. There are no accounts or passwords, so anyone holding that ID can read that user's data. Fine for a demo; add real auth before production.
+- **Identity model:** `?client=<id>` in the URL is ignored unless a demo build sets `NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1`, the websocket URL carries a per-session ticket instead of the client ID, and `X-Forwarded-For` is ignored unless `TRUSTED_PROXY_HOPS` says how many proxies to trust. The model itself is unchanged: a random client ID in `localStorage` identifies a user. There are no accounts or passwords, so anyone holding that ID can read that user's data. Fine for a demo; add real auth before production.
 - Rate limiting and live-session registry are in-process (single container). Use Redis for multi-instance.
 - `pip-audit` was clean for project dependencies after raising the Pillow floor; other findings were in unrelated tooling in the dev environment. `npm audit --omit=dev`: 0 vulnerabilities after moving to Next 16.
 - LLM-based detection can be wrong or evaded; rules plus the output guard are the safety backstop for the persona, not the model.
