@@ -218,13 +218,17 @@ _PRE_NEG = re.compile(
 )
 _INNER_NEG = re.compile(r"\b(never|mat|nahi|nahin)\b|\bdo not\b|\bdon'?t\b|न बता|मत|नहीं", _F)
 
+# Every repetition here is bounded. An open-ended `\d{3,}` followed by `.{0,30}` is polynomial on
+# a long digit run: the match is retried from every digit and each try backtracks through the
+# whole run, so a few thousand digits in one utterance would stall the event loop for seconds.
+# No real amount has more than 15 digits, and a bounded run still matches inside a longer one.
 _MONEY = _c(
-    r"\b(transfer|send|pay|deposit|remit|bhej\w*|jama|submit)\b.{0,40}"
-    r"(rs\.?|₹|rupees?|inr|lakh|crore|\d{3,}|amount|money|funds?|paise)"
-    r"|(भेज|जमा|ट्रांसफर).{0,30}(रुपये|राशि|पैसे|\d{3,})"
-    r"|(rs\.?|₹|rupees?|rupay\w*|lakh|crore|\d{3,}|रुपये|राशि|पैसे).{0,30}"
-    r"\b(bhej\w*|transfer|jama|deposit|send|pay)\b"
-    r"|(रुपये|राशि|पैसे|\d{3,}).{0,30}(भेज|जमा|ट्रांसफर)"
+    r"\b(transfer|send|pay|deposit|remit|bhej\w{0,20}|jama|submit)\b.{0,40}"
+    r"(rs\.?|₹|rupees?|inr|lakh|crore|\d{3,15}|amount|money|funds?|paise)"
+    r"|(भेज|जमा|ट्रांसफर).{0,30}(रुपये|राशि|पैसे|\d{3,15})"
+    r"|(rs\.?|₹|rupees?|rupay\w{0,20}|lakh|crore|\d{3,15}|रुपये|राशि|पैसे).{0,30}"
+    r"\b(bhej\w{0,20}|transfer|jama|deposit|send|pay)\b"
+    r"|(रुपये|राशि|पैसे|\d{3,15}).{0,30}(भेज|जमा|ट्रांसफर)"
 )
 
 
