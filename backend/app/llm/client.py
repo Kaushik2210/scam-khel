@@ -245,6 +245,57 @@ class LLMClient:
             yield buf
         self._record(tier, model, p, c, (time.perf_counter() - t0) * 1000)
 
+    async def _structured_tools(
+        self,
+        tier: Tier,
+        messages: list[dict[str, str]],
+        schema: type[T],
+        *,
+        temperature: float = 0.0,
+        max_tokens: int = 1024,
+    ) -> T | None:
+        """Attempt native tool/function calling if supported."""
+        model = self._model(tier)
+        tool_name = schema.__name__
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": tool_name,
+                    "description": f"Output {tool_name} structured record",
+                    "parameters": schema.model_json_schema(),
+                },
+            }
+        ]
+        tool_choice = {"type": "function", "function": {"name": tool_name}}
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "tools": tools,
+            "tool_choice": tool_choice,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        try:
+            t0 = time.perf_counter()
+            resp = await self.client.chat.completions.create(**kwargs)
+            p = resp.usage.prompt_tokens if resp.usage else 0
+            c = resp.usage.completion_tokens if resp.usage else 0
+            ms = (time.perf_counter() - t0) * 1000
+            self._record(tier, model, p, c, ms)
+            choice = resp.choices[0]
+            if choice.message.tool_calls:
+                call = choice.message.tool_calls[0]
+                args_str = call.function.arguments
+                parsed = json.loads(args_str)
+                return schema.model_validate(parsed)
+            if choice.message.content:
+                return schema.model_validate(extract_json(choice.message.content))
+        except Exception as ex:
+            log.warning("tool_calling_failed_falling_back", tier=tier, error=str(ex)[:200])
+            return None
+        return None
+
     async def structured(
         self,
         tier: Tier,
@@ -255,7 +306,16 @@ class LLMClient:
         temperature: float = 0.0,
         max_tokens: int = 1024,
     ) -> T:
-        """JSON-schema prompt protocol: validate with pydantic, up to `max_repairs` repairs."""
+        """Structured output extraction: tries native tool calling if enabled, falling back to JSON prompt protocol."""
+        if self.offline_handler is None and self.s.structured_mode in ("tools", "auto"):
+            tool_res = await self._structured_tools(
+                tier, messages, schema, temperature=temperature, max_tokens=max_tokens
+            )
+            if tool_res is not None:
+                return tool_res
+            if self.s.structured_mode == "tools":
+                log.info("falling_back_to_json_prompt", tier=tier)
+
         sys_note = (
             "Respond with ONLY a single JSON object matching this JSON schema. "
             "No prose, no markdown fences.\n" + json.dumps(schema.model_json_schema())
