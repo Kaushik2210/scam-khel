@@ -139,13 +139,19 @@ export function useSession() {
       ws.current?.close();
       setState({ ...initial, status: "connecting", simulation: opts.mode !== "shield" });
       try {
-        const created = await api<{ id: string; ws: string; replay: boolean; notice: string | null }>(
+        const created = await api<{
+          id: string;
+          ws: string;
+          ws_ticket: string;
+          replay: boolean;
+          notice: string | null;
+        }>(
           "/api/sessions",
           { method: "POST", body: JSON.stringify({ ...opts, consent: true }) },
         );
         if (!alive.current) return;
         setState((s) => ({ ...s, sessionId: created.id, replay: created.replay, budgetNotice: created.notice }));
-        const sock = new WebSocket(wsUrl(created.ws));
+        const sock = new WebSocket(wsUrl(created.ws, created.ws_ticket));
         ws.current = sock;
         sock.onopen = () => {
           if (opts.mode !== "shield") send({ type: "control", action: "start", speed: opts.speed ?? 1 });

@@ -21,6 +21,16 @@ class RateLimiter:
         q.append(now)
         return True
 
+    def exhausted(self, key: str, limit: int, window_s: float) -> bool:
+        """True if `key` has used up `limit` hits in the window. Records nothing."""
+        now = self._clock()
+        q = self._hits.get(key)
+        if not q:
+            return False
+        while q and now - q[0] > window_s:
+            q.popleft()
+        return len(q) >= limit
+
     def retry_after(self, key: str, window_s: float) -> int:
         q = self._hits.get(key)
         return max(1, int(window_s - (self._clock() - q[0]))) if q else 1

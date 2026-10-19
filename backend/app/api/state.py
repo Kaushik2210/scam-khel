@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import ipaddress
 import re
+import secrets
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -39,6 +40,9 @@ class LiveSession:
     inbox: asyncio.Queue[str | None] = field(default_factory=asyncio.Queue)
     started: bool = False
     summary: dict[str, Any] | None = None
+    # Bearer for the websocket of this one session. It keeps the long-lived client ID
+    # out of the websocket URL (and so out of access logs).
+    ticket: str = field(default_factory=lambda: secrets.token_urlsafe(24))
 
 
 @dataclass

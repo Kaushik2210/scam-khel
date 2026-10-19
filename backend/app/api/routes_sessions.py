@@ -61,11 +61,13 @@ async def create_session(
         if not await repo.has_consent(db, user.id):
             await repo.record_consent(db, user.id)
     sid = str(uuid.uuid4())
-    st.live[sid] = LiveSession(sid, user.id, body.mode, body.scenario, body.language)
+    live = LiveSession(sid, user.id, body.mode, body.scenario, body.language)
+    st.live[sid] = live
     exhausted = st.budget.exhausted
     return {
         "id": sid,
         "ws": f"/ws/sessions/{sid}",
+        "ws_ticket": live.ticket,
         "mode": body.mode,
         "simulation": body.mode != "shield",
         "replay": exhausted,

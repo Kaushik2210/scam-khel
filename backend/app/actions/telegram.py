@@ -5,9 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.guards.ratelimit import RateLimiter
 from app.logging import get_logger
 from app.memory.models import FamilyMember
 
@@ -55,10 +56,21 @@ class TelegramClient:
         await self._call("setWebhook", {"url": url, "secret_token": secret})
 
 
+MAX_BAD_CODES = 5  # wrong codes per chat per hour before that chat is locked out
+BAD_CODE_WINDOW_S = 3600
+
+
 async def handle_update(
-    update: dict[str, Any], db: AsyncSession, client: TelegramClient
+    update: dict[str, Any],
+    db: AsyncSession,
+    client: TelegramClient,
+    limiter: RateLimiter | None = None,
 ) -> str | None:
-    """Process one Telegram update. '/start <code>' links the chat to a family member."""
+    """Process one Telegram update. '/start <code>' links the chat to a family member.
+
+    A code links one chat. Once linked, a different chat cannot take the slot over with the
+    same code, and a chat that keeps sending wrong codes is locked out for a while.
+    """
     msg = update.get("message") or {}
     text = (msg.get("text") or "").strip()
     chat_id = str((msg.get("chat") or {}).get("id", ""))
@@ -70,10 +82,24 @@ async def handle_update(
             chat_id, "Send /start <code> using the code from the SCAM-KHEL app."
         )
         return "missing_code"
-    member = await db.scalar(select(FamilyMember).where(FamilyMember.join_code == parts[1][:16]))
+    attempts_key = f"tg-join:{chat_id}"
+    if limiter and limiter.exhausted(attempts_key, MAX_BAD_CODES, BAD_CODE_WINDOW_S):
+        await client.send_message(chat_id, "Too many wrong codes. Please try again later.")
+        return "rate_limited"
+    code = parts[1][:16].upper()
+    member = await db.scalar(select(FamilyMember).where(func.upper(FamilyMember.join_code) == code))
     if member is None:
+        if limiter:
+            limiter.allow(attempts_key, MAX_BAD_CODES, BAD_CODE_WINDOW_S)
         await client.send_message(chat_id, "That code was not recognised. Check it in the app.")
         return "unknown_code"
+    if member.telegram_chat_id and member.telegram_chat_id != chat_id:
+        await client.send_message(
+            chat_id,
+            "That code is already in use. Ask the person who invited you to remove the entry "
+            "in the app and add you again.",
+        )
+        return "already_linked"
     member.telegram_chat_id = chat_id
     await db.commit()
     await client.send_message(

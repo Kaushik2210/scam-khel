@@ -7,6 +7,7 @@
 make demo                              # resets DB, seeds 2 prior incidents (digital-arrest-parcel, kyc-expiry-bank)
 make dev                               # API :8000   | in another terminal: cd frontend && npm run dev
 # open once:  http://localhost:3000/?client=demo-client-0001   (tick the consent sheet once)
+#   needs NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1 when starting the frontend (demo only)
 # optional, real services: set TELEGRAM_BOT_TOKEN and link your phone via /family; set TAVILY_API_KEY; set NEBIUS_API_KEY + MODEL_*
 ```
 Browser: 1440x900, dark mode, zoom 110%, English UI (switch to Hindi at 2:35 for 3 seconds).
