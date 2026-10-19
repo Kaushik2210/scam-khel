@@ -3,6 +3,13 @@ repos:
     rev: v8.18.4
     hooks:
       - id: gitleaks
+  - repo: local
+    hooks:
+      - id: env-example-has-no-secrets
+        name: example env files must not contain secret values
+        entry: python scripts/check_env_example.py
+        language: python
+        files: '(^|/)\.env[^/]*\.example$'
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.10
     hooks:
