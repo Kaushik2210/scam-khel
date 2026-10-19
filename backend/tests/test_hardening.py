@@ -92,3 +92,66 @@ def test_load_scenario_only_serves_files_listed_in_the_scenario_dir():
     assert [s.id for s in list_scenarios()] == ids
     for sid in ids:
         assert load_scenario(sid).id == sid
+
+
+class _MockClient:
+    def __init__(self, host: str) -> None:
+        self.host = host
+
+
+class _MockRequest:
+    def __init__(self, host: str, headers: dict[str, str] | None = None) -> None:
+        self.client = _MockClient(host)
+        self.headers = headers or {}
+
+
+def test_client_ip_ignores_xff_without_trusted_proxies():
+    from app.api.state import client_ip
+
+    req = _MockRequest("198.51.100.1", {"x-forwarded-for": "203.0.113.5, 10.0.0.1"})
+    # When trusted_proxies is empty, XFF must be ignored
+    assert client_ip(req, trusted_proxies="") == "198.51.100.1"
+
+
+def test_client_ip_resolves_rightmost_untrusted_hop_with_trusted_proxies():
+    from app.api.state import client_ip
+
+    # Direct client is trusted reverse proxy 127.0.0.1, chain is spoofed_client, real_client, trusted_proxy
+    req = _MockRequest("127.0.0.1", {"x-forwarded-for": "1.2.3.4, 203.0.113.195, 127.0.0.1"})
+    # Rightmost untrusted hop is 203.0.113.195
+    assert client_ip(req, trusted_proxies="127.0.0.1, ::1") == "203.0.113.195"
+
+
+def test_client_ip_ignores_xff_if_direct_client_not_in_trusted_proxies():
+    from app.api.state import client_ip
+
+    # Direct client is not in trusted_proxies
+    req = _MockRequest("198.51.100.5", {"x-forwarded-for": "1.2.3.4"})
+    assert client_ip(req, trusted_proxies="127.0.0.1, 10.0.0.0/8") == "198.51.100.5"
+
+
+@pytest.mark.asyncio
+async def test_token_budget_restores_from_db_across_restart(tmp_path):
+    from app.guards.budget import TokenBudget
+    from app.memory.db import init_db, make_engine, make_sessionmaker
+    from app.memory.models import UsageLog
+
+    db_path = tmp_path / "test_budget.db"
+    engine = make_engine(f"sqlite+aiosqlite:///{db_path}")
+    sm = make_sessionmaker(engine)
+    await init_db(engine)
+
+    # First session: write usage records
+    async with sm() as db:
+        db.add(UsageLog(model_tier="fast", prompt_tokens=150, completion_tokens=50))
+        db.add(UsageLog(model_tier="mid", prompt_tokens=300, completion_tokens=100))
+        await db.commit()
+
+    # New process startup: budget starts at 0, then loads from DB
+    budget = TokenBudget(daily_limit=500_000, enforce=True)
+    assert budget.used == 0
+    await budget.load_from_db(sm)
+    assert budget.used == 600  # (150+50) + (300+100)
+    assert budget.status()["used"] == 600
+    await engine.dispose()
+

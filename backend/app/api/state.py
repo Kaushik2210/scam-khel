@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import re
 import time
 from dataclasses import dataclass, field
@@ -76,9 +77,62 @@ def get_state(request: Request) -> AppState:
     return state
 
 
-def client_ip(request: Request) -> str:
+def _parse_trusted_proxies(trusted_str: str) -> list[ipaddress.IPv4Network | ipaddress.IPv6Network]:
+    nets: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = []
+    for item in trusted_str.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            if "/" in item:
+                nets.append(ipaddress.ip_network(item, strict=False))
+            else:
+                ip = ipaddress.ip_address(item)
+                nets.append(ipaddress.ip_network(f"{ip}/{32 if ip.version == 4 else 128}"))
+        except ValueError:
+            continue
+    return nets
+
+
+def _is_ip_trusted(ip_str: str, nets: list[ipaddress.IPv4Network | ipaddress.IPv6Network]) -> bool:
+    try:
+        ip = ipaddress.ip_address(ip_str.strip())
+        return any(ip in net for net in nets)
+    except ValueError:
+        return False
+
+
+def client_ip(request: Request, trusted_proxies: str | None = None) -> str:
+    """Return the client's IP address.
+
+    If trusted_proxies is configured, parse X-Forwarded-For right-to-left
+    skipping trusted proxies to find the rightmost untrusted hop.
+    If direct client is not trusted or trusted_proxies is empty,
+    X-Forwarded-For is ignored to prevent spoofing.
+    """
+    direct = request.client.host if request.client else "?"
+    if trusted_proxies is None:
+        try:
+            trusted_proxies = request.app.state.s.settings.trusted_proxies
+        except AttributeError:
+            trusted_proxies = ""
+
+    trusted_nets = _parse_trusted_proxies(trusted_proxies)
+    if not trusted_nets:
+        return direct
+
+    if direct != "?" and not _is_ip_trusted(direct, trusted_nets):
+        return direct
+
     fwd = request.headers.get("x-forwarded-for", "")
-    return fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "?")
+    if not fwd:
+        return direct
+
+    hops = [h.strip() for h in fwd.split(",") if h.strip()]
+    for hop in reversed(hops):
+        if not _is_ip_trusted(hop, trusted_nets):
+            return hop
+    return hops[0] if hops else direct
 
 
 async def user_for_client(db: AsyncSession, client_id: str) -> User:

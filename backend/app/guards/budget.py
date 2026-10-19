@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime
+from datetime import time as dt_time
+from typing import TYPE_CHECKING
 
 from app.llm.usage import UsageRecord
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
 class TokenBudget:
@@ -23,6 +28,22 @@ class TokenBudget:
     def record(self, rec: UsageRecord) -> None:
         self._roll()
         self.used += rec.prompt_tokens + rec.completion_tokens
+
+    async def load_from_db(self, sm: async_sessionmaker[AsyncSession]) -> int:
+        """Restore today's token usage from usage_log table across process restarts."""
+        from sqlalchemy import func, select
+
+        from app.memory.models import UsageLog
+
+        self._roll()
+        today_start = datetime.combine(self._day, dt_time.min, tzinfo=UTC)
+        async with sm() as db:
+            stmt = select(
+                func.coalesce(func.sum(UsageLog.prompt_tokens + UsageLog.completion_tokens), 0)
+            ).where(UsageLog.ts >= today_start)
+            db_used = int(await db.scalar(stmt) or 0)
+            self.used = max(self.used, db_used)
+            return self.used
 
     @property
     def exhausted(self) -> bool:

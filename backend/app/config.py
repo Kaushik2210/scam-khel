@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     max_turns_per_session: int = 20
     admin_token: str = ""
     frontend_origin: str = "http://localhost:3000"
+    trusted_proxies: str = ""  # comma-separated IPs/subnets (e.g. "127.0.0.1, ::1, 10.0.0.0/8")
 
     def model_for(self, tier: Tier) -> str:
         return {"fast": self.model_fast, "mid": self.model_mid, "deep": self.model_deep}[tier]

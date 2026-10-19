@@ -104,7 +104,8 @@ def create_app(
         await init_db(engine)
         async with state.sm() as db:
             await seed_scripts(db)
-        log.info("startup", llm_mode=state.llm_mode, demo=s.demo_mode)
+        await budget.load_from_db(state.sm)
+        log.info("startup", llm_mode=state.llm_mode, demo=s.demo_mode, budget_used=budget.used)
         yield
         await engine.dispose()
 
