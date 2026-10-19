@@ -5,15 +5,15 @@
    "n": 43,
    "scam": 26,
    "legit": 17,
-   "tp": 25,
+   "tp": 26,
    "fp": 0,
-   "fn": 1,
+   "fn": 0,
    "precision": 1.0,
-   "recall": 0.962,
-   "f1": 0.98,
+   "recall": 1.0,
+   "f1": 1.0,
    "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.32,
-   "critical_by_payment_rate": 0.885
+   "mean_turns_to_detect": 2.27,
+   "critical_by_payment_rate": 1.0
   },
   "tuned_set": {
    "n": 22,
@@ -26,22 +26,22 @@
    "recall": 1.0,
    "f1": 1.0,
    "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.29,
+   "mean_turns_to_detect": 2.21,
    "critical_by_payment_rate": 1.0
   },
   "held_out_set": {
    "n": 21,
    "scam": 12,
    "legit": 9,
-   "tp": 11,
+   "tp": 12,
    "fp": 0,
-   "fn": 1,
+   "fn": 0,
    "precision": 1.0,
-   "recall": 0.917,
-   "f1": 0.957,
+   "recall": 1.0,
+   "f1": 1.0,
    "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.36,
-   "critical_by_payment_rate": 0.75
+   "mean_turns_to_detect": 2.33,
+   "critical_by_payment_rate": 1.0
   },
   "by_language": {
    "en": {
@@ -55,8 +55,8 @@
     "recall": 1.0,
     "f1": 1.0,
     "fp_rate_legit": 0.0,
-    "mean_turns_to_detect": 2.54,
-    "critical_by_payment_rate": 0.846
+    "mean_turns_to_detect": 2.46,
+    "critical_by_payment_rate": 1.0
    },
    "hi": {
     "n": 5,
@@ -76,49 +76,18 @@
     "n": 14,
     "scam": 9,
     "legit": 5,
-    "tp": 8,
+    "tp": 9,
     "fp": 0,
-    "fn": 1,
+    "fn": 0,
     "precision": 1.0,
-    "recall": 0.889,
-    "f1": 0.941,
+    "recall": 1.0,
+    "f1": 1.0,
     "fp_rate_legit": 0.0,
-    "mean_turns_to_detect": 2.12,
-    "critical_by_payment_rate": 0.889
+    "mean_turns_to_detect": 2.11,
+    "critical_by_payment_rate": 1.0
    }
   },
-  "errors": [
-   {
-    "id": "ev-scam-05-electricity-hinglish",
-    "set": "held-out",
-    "label": "scam",
-    "language": "hinglish",
-    "peak": 51,
-    "pred_scam": false,
-    "turns_to_detect": null,
-    "critical_by_payment": false
-   },
-   {
-    "id": "ev-scam-06-remote-refund",
-    "set": "held-out",
-    "label": "scam",
-    "language": "en",
-    "peak": 78,
-    "pred_scam": true,
-    "turns_to_detect": 3,
-    "critical_by_payment": false
-   },
-   {
-    "id": "ev-scam-07-lottery",
-    "set": "held-out",
-    "label": "scam",
-    "language": "en",
-    "peak": 73,
-    "pred_scam": true,
-    "turns_to_detect": 2,
-    "critical_by_payment": false
-   }
-  ]
+  "errors": []
  },
  "honeypot": {
   "scenarios": [
@@ -252,13 +221,13 @@
    },
    {
     "scenario": "kyc-expiry-bank",
-    "first_detect_turn": 4,
+    "first_detect_turn": 2,
     "second_detect_turn": 2,
     "second_memory_hit_turn": 2,
-    "benefit": 2
+    "benefit": 0
    }
   ],
-  "memory_mean_turns_saved": 1.43
+  "memory_mean_turns_saved": 1.14
  },
  "usage": {
   "by_tier": {

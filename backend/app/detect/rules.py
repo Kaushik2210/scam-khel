@@ -31,6 +31,14 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
         (_c(r"\b(police|pulis|thana)\b"), 0.8),
         (
             _c(
+                r"\b(bijli (vibhag|board|office|karmi)|electricity (department|board|office|authority)"
+                r"|power (corporation|department|board))\b"
+            ),
+            0.8,
+        ),
+        (_c(r"बिजली विभाग|विद्युत विभाग|पावर कॉर्पोरेशन"), 0.8),
+        (
+            _c(
                 r"\b(bank (manager|officer|executive)|customer care|kyc (team|department)"
                 r"|from (the )?bank)\b"
             ),
@@ -47,6 +55,14 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.9,
         ),
         (_c(r"गिरफ्तार|वारंट|जेल|केस दर्ज|अवैध|मनी लॉन्ड्रिंग|ड्रग|हिरासत"), 0.9),
+        (
+            _c(
+                r"\b(connection|line|bijli|power|service|account)\b.{0,20}\b(kat|cut|disconnect\w*|band|freez\w*|suspend\w*)\b"
+                r"|\b(kat|cut|disconnect\w*|band)\s+(jayega|karenge|kar denge|ho jayega)\b"
+            ),
+            0.7,
+        ),
+        (_c(r"कनेक्शन (कट|बंद)|बिजली कट|लाइन कट"), 0.7),
         (_c(r"\b(blocked|freez\w*|frozen|seiz\w*|disconnect(ed|ion)?|suspend\w*)\b"), 0.5),
     ],
     "isolation_secrecy": [
@@ -73,6 +89,13 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.95,
         ),
         (_c(r"किसी को.{0,12}(मत|न|नहीं).{0,15}(बता|बोल)"), 0.95),
+        (
+            _c(
+                r"\b(keep (this|it)?\s*(strictly )?confidential|maintain secrecy|strictly confidential)\b"
+            ),
+            0.85,
+        ),
+        (_c(r"गोपनीय रखें|गुप्त रखें"), 0.85),
         (_c(r"\b(confidential|top secret|secret case|secrecy)\b"), 0.6),
     ],
     "stay_on_camera_digital_arrest": [
@@ -105,10 +128,13 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.7,
         ),
         (
-            _c(r"\b(turant|abhi ke abhi|foran|jaldi|aaj hi|ek ghante|\d+ ?(minute|ghante) mein)\b"),
+            _c(
+                r"\b(turant|abhi ke abhi|foran|jaldi|aaj hi|aaj raat|aaj shaam|by tonight"
+                r"|ek ghante|\d+ ?(minute|ghante) mein)\b"
+            ),
             0.7,
         ),
-        (_c(r"तुरंत|अभी के अभी|जल्दी|आज ही|घंटे में|मिनट में"), 0.7),
+        (_c(r"तुरंत|अभी के अभी|जल्दी|आज ही|आज रात|आज शाम|घंटे में|मिनट में"), 0.7),
     ],
     "fake_case_or_badge_id": [
         (

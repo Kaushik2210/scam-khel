@@ -28,11 +28,25 @@ COMBOS: list[tuple[str, set[str], int]] = [
     ),
     ("stay_on_camera_digital_arrest", {"fear_arrest_threat", "authority_impersonation"}, 10),
     ("document_demand", {"authority_impersonation", "fear_arrest_threat"}, 10),
-    ("otp_request", {"authority_impersonation", "fear_arrest_threat", "urgency_deadline"}, 12),
     (
         "remote_access_app_request",
-        {"authority_impersonation", "fear_arrest_threat", "urgency_deadline"},
+        {"otp_request", "authority_impersonation", "fear_arrest_threat", "urgency_deadline"},
+        14,
+    ),
+    (
+        "otp_request",
+        {"remote_access_app_request", "authority_impersonation", "fear_arrest_threat", "urgency_deadline"},
         12,
+    ),
+    (
+        "verification_fee_or_deposit",
+        {"urgency_deadline", "isolation_secrecy", "authority_impersonation", "fear_arrest_threat"},
+        12,
+    ),
+    (
+        "link_or_apk_push",
+        {"urgency_deadline", "fear_arrest_threat", "authority_impersonation", "verification_fee_or_deposit"},
+        10,
     ),
 ]
 
@@ -93,15 +107,19 @@ class RiskEngine:
         score = base + bonus
         if payment_now:
             score += 15  # an explicit money ask is the decisive signal
-        # Payment demand under coercion is critical by definition.
+        # Payment demand under coercion or account takeover is critical by definition.
         coercive = {k for k in COERCIVE if s.tactics.get(k, 0) >= STRONG_CONF}
         le_urgent = (
             s.tactics.get("authority_impersonation", 0) >= LE_AUTHORITY_CONF
             and s.tactics.get("urgency_deadline", 0) >= STRONG_CONF
         )
-        if s.payment_demand_seen and (coercive or le_urgent) and len(strong) >= 2:
+        remote_takeover = (
+            s.tactics.get("remote_access_app_request", 0) >= STRONG_CONF
+            and (s.tactics.get("otp_request", 0) >= STRONG_CONF or s.payment_demand_seen)
+        )
+        if (s.payment_demand_seen and (coercive or le_urgent) and len(strong) >= 2) or remote_takeover:
             score = max(score, CRITICAL)
-            reasons.append("payment demand under coercion")
+            reasons.append("payment demand under coercion / takeover")
 
         s.score = max(s.score, min(100, round(score)))  # monotonic within a conversation
         s.level = level_for(s.score)
