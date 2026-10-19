@@ -120,15 +120,15 @@ Measured by `make eval` (offline, deterministic), never hand-written. Full repor
 | Metric | Result |
 |---|---|
 | Eval set | 43 dialogues (26 scam / 17 legit; EN, Hindi, Hinglish) |
-| Precision / recall / F1 @ high (≥70), all | 1.0 / 0.962 / 0.98 |
-| Same, held-out set only (21) | 1.0 / 0.917 / 0.957 |
+| Precision / recall / F1 @ high (≥70), all | 1.0 / 1.0 / 1.0 |
+| Same, held-out set only (21) | 1.0 / 1.0 / 1.0 |
 | False-positive rate on legit (all / held-out) | 0.0 / 0.0 |
-| Mean scammer turns to reach high | 2.32 |
-| Critical by first payment demand | 0.885 |
+| Mean scammer turns to reach high | 2.27 |
+| Critical by first payment demand | 1.0 |
 | Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 438s |
 | Identifier types extracted per session (mean) | 7.6 |
 | Persona leakage rate (guard violations per persona turn) | 0.0000 |
-| Memory benefit: turns saved on 2nd exposure (mean) | 1.43 |
+| Memory benefit: turns saved on 2nd exposure (mean) | 1.14 |
 | Run mode | offline (rules + scripted fallbacks, no LLM) |
 <!-- EVAL:END -->
 

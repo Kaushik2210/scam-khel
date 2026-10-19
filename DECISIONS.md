@@ -27,4 +27,12 @@
 | 23 | `STRUCTURED_MODE=tools` reserved, not implemented | JSON-prompt + repair is the only implemented path; tool calling needs a live model to validate (backlog P1-01). |
 | 24 | Report assistant never submits to cybercrime.gov.in | Portal needs the complainant's login, OTP and captcha; automating them would bypass safeguards and could file false complaints. |
 | 25 | Light theme is the default; Auto/Dark available | Friendlier for elders and first impressions; HIG says support both. |
+| 26 | `STRUCTURED_MODE=tools` implemented with OpenAI tool format + JSON-prompt fallback | Native tool calling (`tools` + `tool_choice`) maps Pydantic schema to OpenAI function format; automatically falls back to JSON-prompt format if unsupported. |
+| 27 | Client IP resolution strips trusted proxies right-to-left from `X-Forwarded-For` | Defaulting to direct peer IP prevents untrusted callers from forging XFF headers to bypass rate limits. |
+| 28 | Token budget reloads today's usage from `usage_log` at startup | Ensures daily budget caps are not wiped clean upon backend container restarts. |
+| 29 | Paraphrase detection: utility alias patterns, remote takeover combos, and advance lottery deposit combos reach critical on first payment demand | Eliminates late detection on non-police scam variants while maintaining 0.0 FP on legitimate dialogues. |
+| 30 | User feedback loop: `IncidentFeedback` table and calibration stats | Enables users to mark incidents as confirmed scam or false alarm, recording client IP and timestamps to calibrate detection models. |
+| 31 | In-memory ASR endpoint `POST /api/voice/transcribe` consumes raw body stream up to 2MB | Avoids `python-multipart` dependency, enforces zero disk persistence of user audio, and dispatches directly to ASR adapter. |
+| 32 | Docker container startup: `entrypoint.sh` executes `alembic upgrade head` before `uvicorn` | Guarantees database schema migrations are applied automatically in container environments with container healthchecks. |
+
 
