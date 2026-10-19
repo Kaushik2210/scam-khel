@@ -43,3 +43,9 @@ class PanicIn(BaseModel):
     bank_name: str = Field("", max_length=80)
     txn_reference: str = Field("", max_length=64)
     caller_phone: str = Field("", max_length=20)
+
+
+class FeedbackIn(BaseModel):
+    verdict: Literal["scam", "not_scam"]
+    notes: str = Field("", max_length=500)
+

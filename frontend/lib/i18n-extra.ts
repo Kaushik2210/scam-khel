@@ -58,6 +58,15 @@ export const EXTRA_EN = {
   "faq.a3": "No. It warns you, alerts your family and prepares evidence. The honeypot is a simulation only.",
   "faq.q4": "Is it free?",
   "faq.a4": "This is a hackathon demo and is free to try.",
+  "feedback.prompt": "Was this analysis accurate?",
+  "feedback.help": "Your feedback helps calibrate detection thresholds and reduce false alarms.",
+  "feedback.confirmedScam": "Confirmed Scam",
+  "feedback.falseAlarm": "False Alarm",
+  "feedback.recorded": "Feedback saved",
+  "feedback.title": "Detection accuracy & feedback",
+  "feedback.confirmedCount": "Confirmed scams",
+  "feedback.falseAlarmCount": "False alarms",
+  "feedback.accuracy": "Accuracy rate",
 } as const;
 
 export const EXTRA_HI: Record<keyof typeof EXTRA_EN, string> = {
@@ -119,4 +128,13 @@ export const EXTRA_HI: Record<keyof typeof EXTRA_EN, string> = {
   "faq.a3": "नहीं। यह आपको चेताता है, परिवार को अलर्ट देता है और सबूत तैयार करता है। हनीपॉट केवल सिमुलेशन है।",
   "faq.q4": "क्या यह मुफ़्त है?",
   "faq.a4": "यह हैकाथॉन डेमो है और आज़माने के लिए मुफ़्त है।",
+  "feedback.prompt": "क्या यह विश्लेषण सही था?",
+  "feedback.help": "आपकी प्रतिक्रिया से अलर्ट बेहतर होते हैं और गलत चेतावनियाँ कम होती हैं।",
+  "feedback.confirmedScam": "धोखाधड़ी सही पहचानी",
+  "feedback.falseAlarm": "गलत चेतावनी (False Alarm)",
+  "feedback.recorded": "प्रतिक्रिया दर्ज हुई",
+  "feedback.title": "पहचान की सटीकता और प्रतिक्रिया",
+  "feedback.confirmedCount": "पुष्ट धोखाधड़ी",
+  "feedback.falseAlarmCount": "गलत चेतावनियाँ",
+  "feedback.accuracy": "सटीकता दर",
 };

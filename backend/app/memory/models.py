@@ -104,6 +104,16 @@ class Incident(Base):
     detect_turn: Mapped[int | None] = mapped_column(Integer, default=None)  # risk reached `high`
     memory_hit_turn: Mapped[int | None] = mapped_column(Integer, default=None)
     data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # timeline, verifications...
+    feedback_verdict: Mapped[str | None] = mapped_column(String(16), default=None)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class IncidentFeedback(Base):
+    __tablename__ = "incident_feedback"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incidents.id"), index=True)
+    verdict: Mapped[str] = mapped_column(String(16))  # "scam" | "not_scam"
+    notes: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

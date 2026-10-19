@@ -15,9 +15,16 @@ interface Script {
   last_seen: string;
 }
 
+interface FeedbackStats {
+  confirmed_scams: number;
+  false_alarms: number;
+  total_feedback: number;
+}
+
 export default function MemoryPage() {
   const { t, lang } = useI18n();
   const { data, error, loading } = useFetch<Script[]>("/api/memory/scripts");
+  const { data: stats } = useFetch<FeedbackStats>("/api/memory/feedback-stats");
   const learned = (data ?? []).filter((s) => !s.seed);
   const builtin = (data ?? []).filter((s) => s.seed);
   const list = (items: Script[]) => (
@@ -48,6 +55,26 @@ export default function MemoryPage() {
       <p className="text-callout text-label2">{t("memory.sub")}</p>
       {loading && <Skeleton rows={4} />}
       {error && <Notice tone="error">{error}</Notice>}
+      {stats && stats.total_feedback > 0 && (
+        <Card title={t("feedback.title")}>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-xl border border-sep bg-surface p-3">
+              <span className="block text-title2 font-bold text-[var(--tint)]">{stats.confirmed_scams}</span>
+              <span className="text-footnote text-label3">{t("feedback.confirmedCount")}</span>
+            </div>
+            <div className="rounded-xl border border-sep bg-surface p-3">
+              <span className="block text-title2 font-bold text-label1">{stats.false_alarms}</span>
+              <span className="text-footnote text-label3">{t("feedback.falseAlarmCount")}</span>
+            </div>
+            <div className="rounded-xl border border-sep bg-surface p-3">
+              <span className="block text-title2 font-bold text-[var(--tint)]">
+                {Math.round((stats.confirmed_scams / stats.total_feedback) * 100)}%
+              </span>
+              <span className="text-footnote text-label3">{t("feedback.accuracy")}</span>
+            </div>
+          </div>
+        </Card>
+      )}
       <Card title={t("memory.learned")}>{learned.length ? list(learned) : <Empty>{t("incidents.empty")}</Empty>}</Card>
       <Card title={t("memory.builtin")}>{list(builtin)}</Card>
     </div>

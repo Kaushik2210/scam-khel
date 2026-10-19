@@ -347,3 +347,44 @@ def test_report_fields_for_filing_assistant(client):
         ).status_code
         == 404
     )
+
+
+def test_incident_feedback_loop(client):
+    text = (
+        "This is Inspector Rao from the National Crime Verification Cell. Your Aadhaar is linked to a "
+        "case, warrant ready.\nYou are under digital arrest, do not tell anyone.\n"
+        "Transfer Rs 90,000 to the RBI safe account simverify@examplebank now."
+    )
+    a = client.post(
+        "/api/analyze", headers=H, json={"text": text, "language": "en", "consent": True}
+    ).json()
+    iid = a["incident_id"]
+
+    # Initially feedback is None
+    inc = client.get(f"/api/incidents/{iid}", headers=H).json()
+    assert inc["feedback_verdict"] is None
+
+    # Post scam feedback
+    fb = client.post(
+        f"/api/incidents/{iid}/feedback",
+        headers=H,
+        json={"verdict": "scam", "notes": "Correct detection of digital arrest"},
+    )
+    assert fb.status_code == 200
+    assert fb.json() == {"id": iid, "verdict": "scam", "saved": True}
+
+    # Verify incident detail shows verdict
+    inc = client.get(f"/api/incidents/{iid}", headers=H).json()
+    assert inc["feedback_verdict"] == "scam"
+
+    # Verify list of incidents includes feedback_verdict
+    incs = client.get("/api/incidents", headers=H).json()
+    target = next(i for i in incs if i["id"] == iid)
+    assert target["feedback_verdict"] == "scam"
+
+    # Verify feedback stats
+    stats = client.get("/api/memory/feedback-stats", headers=H).json()
+    assert stats["confirmed_scams"] == 1
+    assert stats["false_alarms"] == 0
+    assert stats["total_feedback"] == 1
+
