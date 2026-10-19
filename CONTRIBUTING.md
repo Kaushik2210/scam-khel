@@ -19,6 +19,17 @@ make setup
 cd frontend && npm install
 ```
 
+## Secrets
+
+This repository is public, and git history is forever.
+
+- Real keys and tokens go in `.env`, which is git-ignored. **Never** in `.env.example`, a test, a doc or a commit message: the example files list which variables exist and must leave every `*_KEY`, `*_TOKEN`, `*_SECRET` and `*_PASSWORD` empty.
+- Install the hooks once: `pip install pre-commit && pre-commit install`. They run gitleaks on what you stage and `scripts/check_env_example.py` on example env files.
+- CI repeats both checks and also scans the **whole** history on every push, because a secret that is committed and then removed in the next commit is still public.
+- **If you committed a real credential, assume it is compromised.** Revoke or rotate it at the provider first (Tavily, BotFather `/revoke`, a new `FERNET_KEY`, ...), then fix the file. Deleting the line in a follow-up commit, or force-pushing, does not make it private again, because clones and caches already have it. Tell a maintainer so the key owner can confirm the rotation.
+- Do not add commits to the allowlist in `.gitleaks.toml` to get a build green. Rotate the credential instead; the allowlist only records findings that were already public and handled.
+- Maintainers: enable GitHub secret scanning with push protection and branch protection on `main` (require the `secret scan` check). A failed check on a direct push does not block anything by itself.
+
 ## Everyday commands
 
 | Command | What it does |

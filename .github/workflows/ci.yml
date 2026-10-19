@@ -20,6 +20,19 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: gitleaks/gitleaks-action@v3
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: Example env files hold no secret values
+        run: python3 scripts/check_env_example.py
+      # The action above only looks at the commits in a push, so a key that is committed and
+      # then blanked in the next commit slips past it. This scans every commit on every ref.
+      - name: Scan the full history
+        env:
+          GITLEAKS_VERSION: "8.18.4"
+          GITLEAKS_SHA256: "ba6dbb656933921c775ee5a2d1c13a91046e7952e9d919f9bac4cec61d628e7d"
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o gitleaks.tgz
+          echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
+          tar -xzf gitleaks.tgz gitleaks
+          ./gitleaks detect --source . --config .gitleaks.toml --redact --no-banner --log-opts="--all"
 
   backend:
     name: backend (py${{ matrix.python }})
