@@ -43,3 +43,50 @@ def test_status_is_honest_about_fallback():
     assert s["asr"]["active"] == "browser-web-speech" and s["asr"]["nvidia_verified"] is False
     assert s["audio_stored"] is False and "not an NVIDIA" in s["tts"]["fallback"]
     assert voice_status("https://a.test", "")["asr"]["active"] == "nvidia-asr-http"
+
+
+def test_transcribe_endpoint_rejects_when_not_configured(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(_env_file=None, asr_base_url=""), use_llm=False)
+    with TestClient(app) as client:
+        r = client.post(
+            "/api/voice/transcribe",
+            content=b"RIFF1234",
+            params={"language": "en"},
+            headers={"Content-Type": "audio/wav"},
+        )
+        assert r.status_code == 501
+        assert "not configured" in r.json()["detail"]
+
+
+def test_transcribe_endpoint_rejects_empty_audio(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(_env_file=None, asr_base_url="https://asr.test/v1"), use_llm=False)
+    with TestClient(app) as client:
+        r = client.post("/api/voice/transcribe", content=b"")
+        assert r.status_code == 400
+
+
+def test_transcribe_endpoint_rejects_oversized_audio(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(_env_file=None, asr_base_url="https://asr.test/v1"), use_llm=False)
+    with TestClient(app) as client:
+        r = client.post(
+            "/api/voice/transcribe",
+            content=b"0" * (3 * 1024 * 1024),
+            headers={"Content-Type": "audio/wav"},
+        )
+        assert r.status_code == 413
+
