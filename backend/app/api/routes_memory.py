@@ -3,13 +3,21 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.actions.report_fields import build_report_fields
 from app.api.helpers import complaint_from_db, incident_for_user
+from app.api.schemas import FeedbackIn
 from app.api.state import AppState, current_user
 from app.memory import repo
-from app.memory.models import EvidenceItem, Incident, ScamScript, Session, User
+from app.memory.models import (
+    EvidenceItem,
+    Incident,
+    IncidentFeedback,
+    ScamScript,
+    Session,
+    User,
+)
 
 router = APIRouter()
 UserDep = tuple[AppState, User]
@@ -60,6 +68,7 @@ async def incidents(ctx: UserDep = Depends(current_user)) -> list[dict[str, Any]
             "detect_turn": i.detect_turn,
             "memory_hit_turn": i.memory_hit_turn,
             "recognised_script_id": i.recognised_script_id,
+            "feedback_verdict": i.feedback_verdict,
         }
         for i, s in rows
     ]
@@ -90,6 +99,7 @@ async def incident(incident_id: int, ctx: UserDep = Depends(current_user)) -> di
         "detect_turn": inc.detect_turn,
         "memory_hit_turn": inc.memory_hit_turn,
         "script": script.name if script else None,
+        "feedback_verdict": inc.feedback_verdict,
         "simulation": d.get("simulation", True),
         "scenario": d.get("scenario"),
         "timeline": d.get("timeline", []),
@@ -99,6 +109,58 @@ async def incident(incident_id: int, ctx: UserDep = Depends(current_user)) -> di
         "evidence": [
             {"type": e.type, "value": e.value, "confidence": round(e.confidence, 2)} for e in ev
         ],
+    }
+
+
+@router.post("/api/incidents/{incident_id}/feedback")
+async def incident_feedback(
+    incident_id: int, body: FeedbackIn, ctx: UserDep = Depends(current_user)
+) -> dict[str, Any]:
+    """Store user feedback: 'scam' or 'not_scam' (false positive) to calibrate detection."""
+    st, user = ctx
+    async with st.sm() as db:
+        found = await incident_for_user(db, user.id, incident_id=incident_id)
+        if not found:
+            raise HTTPException(404, "not found")
+        inc, _ = found
+        inc.feedback_verdict = body.verdict
+        fb = IncidentFeedback(
+            incident_id=inc.id,
+            verdict=body.verdict,
+            notes=body.notes,
+        )
+        db.add(fb)
+        await db.commit()
+    return {"id": incident_id, "verdict": body.verdict, "saved": True}
+
+
+@router.get("/api/memory/feedback-stats")
+async def feedback_stats(ctx: UserDep = Depends(current_user)) -> dict[str, Any]:
+    """Return user feedback calibration counts (confirmed scams vs false alarms)."""
+    st, user = ctx
+    async with st.sm() as db:
+        total_scam = (
+            await db.scalar(
+                select(func.count(IncidentFeedback.id))
+                .join(Incident, Incident.id == IncidentFeedback.incident_id)
+                .join(Session, Session.id == Incident.session_id)
+                .where(Session.user_id == user.id, IncidentFeedback.verdict == "scam")
+            )
+            or 0
+        )
+        total_not_scam = (
+            await db.scalar(
+                select(func.count(IncidentFeedback.id))
+                .join(Incident, Incident.id == IncidentFeedback.incident_id)
+                .join(Session, Session.id == Incident.session_id)
+                .where(Session.user_id == user.id, IncidentFeedback.verdict == "not_scam")
+            )
+            or 0
+        )
+    return {
+        "confirmed_scams": int(total_scam),
+        "false_alarms": int(total_not_scam),
+        "total_feedback": int(total_scam + total_not_scam),
     }
 
 

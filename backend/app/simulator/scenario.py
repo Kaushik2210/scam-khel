@@ -29,10 +29,16 @@ class Scenario(BaseModel):
         return line.format(agency=self.agency, **self.identifiers)
 
 
+def _scenario_files() -> dict[str, Path]:
+    return {p.stem: p for p in SCENARIO_DIR.glob("*.yaml") if p.is_file()}
+
+
 @lru_cache
 def load_scenario(scenario_id: str) -> Scenario:
-    path = SCENARIO_DIR / f"{scenario_id}.yaml"
-    if not path.is_file() or path.parent != SCENARIO_DIR:
+    # The id only selects among files that exist in SCENARIO_DIR. The path that is opened comes
+    # from that listing, never from the caller's string, so no input can name another file.
+    path = _scenario_files().get(scenario_id)
+    if path is None:
         raise KeyError(f"unknown scenario: {scenario_id!r}")
     sc = Scenario.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
     if "(SIMULATION)" not in sc.agency:

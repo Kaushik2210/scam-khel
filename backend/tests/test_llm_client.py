@@ -154,3 +154,54 @@ def test_missing_key_is_clear_error():
     c = LLMClient(Settings(_env_file=None, model_fast="f"))
     with pytest.raises(LLMError, match="NEBIUS_API_KEY"):
         _ = c.client
+
+
+def tool_completion(args_json: str) -> dict:
+    return {
+        "id": "tc1",
+        "object": "chat.completion",
+        "created": 0,
+        "model": "f",
+        "choices": [
+            {
+                "index": 0,
+                "finish_reason": "tool_calls",
+                "message": {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "call_1",
+                            "type": "function",
+                            "function": {"name": "Out", "arguments": args_json},
+                        }
+                    ],
+                },
+            }
+        ],
+        "usage": {"prompt_tokens": 10, "completion_tokens": 8, "total_tokens": 18},
+    }
+
+
+async def test_structured_native_tool_calling_success():
+    route = Route([httpx.Response(200, json=tool_completion('{"a": 42}'))])
+    c, t = mk(route, structured_mode="tools")
+    out = await c.structured("fast", [{"role": "user", "content": "x"}], Out)
+    assert out.a == 42
+    assert route.call_count == 1
+    assert b'"tools":' in route.bodies[0]
+
+
+async def test_structured_native_tool_calling_falls_back_to_json_prompt():
+    route = Route(
+        [
+            # First attempt (native tool calling) returns 400 (e.g. tools unsupported)
+            httpx.Response(400, json={"error": {"message": "tools unsupported by model"}}),
+            # Fallback to JSON-prompt succeeds
+            httpx.Response(200, json=completion('{"a": 99}')),
+        ]
+    )
+    c, t = mk(route, structured_mode="tools")
+    out = await c.structured("fast", [{"role": "user", "content": "x"}], Out)
+    assert out.a == 99
+    assert route.call_count == 2

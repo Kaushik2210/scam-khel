@@ -106,7 +106,7 @@ make dev                        # API on :8000   (second terminal: cd frontend &
 
 Start the frontend with `NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1` (demo only, see `frontend/.env.example`), then open <http://localhost:3000/?client=demo-client-0001> to see the seeded incidents. Or: `docker compose up --build`.
 
-**Deploy:** frontend on Vercel (`NEXT_PUBLIC_API_URL` = your API URL); backend container (`backend/Dockerfile`) on Render / Fly / Railway with a persistent volume at `/data`, `DEMO_MODE=true`, `FRONTEND_ORIGIN` = the Vercel URL, `ADMIN_TOKEN` and `FERNET_KEY` set, and `TRUSTED_PROXY_HOPS=1` (the host's proxy sets `X-Forwarded-For`; without it every visitor shares the proxy's address and the per-IP limits apply to everyone together). Details in [docs/MANUAL_STEPS.md](docs/MANUAL_STEPS.md).
+**Deploy:** frontend on Vercel (`NEXT_PUBLIC_API_URL` = your API URL); backend container (`backend/Dockerfile`) on Render / Fly / Railway with a persistent volume at `/data`, `DEMO_MODE=true`, `FRONTEND_ORIGIN` = the Vercel URL, `ADMIN_TOKEN` and `FERNET_KEY` set, and `TRUSTED_PROXIES` set to the address range of the host's proxy (without it every visitor shares the proxy's address and the per-IP limits apply to everyone together). Details in [docs/MANUAL_STEPS.md](docs/MANUAL_STEPS.md).
 
 ### Environment variables
 
@@ -120,15 +120,15 @@ Measured by `make eval` (offline, deterministic), never hand-written. Full repor
 | Metric | Result |
 |---|---|
 | Eval set | 43 dialogues (26 scam / 17 legit; EN, Hindi, Hinglish) |
-| Precision / recall / F1 @ high (≥70), all | 1.0 / 0.962 / 0.98 |
-| Same, held-out set only (21) | 1.0 / 0.917 / 0.957 |
+| Precision / recall / F1 @ high (≥70), all | 1.0 / 1.0 / 1.0 |
+| Same, held-out set only (21) | 1.0 / 1.0 / 1.0 |
 | False-positive rate on legit (all / held-out) | 0.0 / 0.0 |
-| Mean scammer turns to reach high | 2.32 |
-| Critical by first payment demand | 0.885 |
+| Mean scammer turns to reach high | 2.27 |
+| Critical by first payment demand | 1.0 |
 | Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 438s |
 | Identifier types extracted per session (mean) | 7.6 |
 | Persona leakage rate (guard violations per persona turn) | 0.0000 |
-| Memory benefit: turns saved on 2nd exposure (mean) | 1.43 |
+| Memory benefit: turns saved on 2nd exposure (mean) | 1.14 |
 | Run mode | offline (rules + scripted fallbacks, no LLM) |
 <!-- EVAL:END -->
 

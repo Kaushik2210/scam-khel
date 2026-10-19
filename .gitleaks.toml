@@ -1,0 +1,34 @@
+# gitleaks config, picked up automatically by the CLI, the pre-commit hook and the CI jobs.
+title = "scam-khel gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "fernet-key"
+description = "Fernet encryption key"
+regex = '''(?i)fernet[_-]?key["']?\s*[=:]\s*["']?([A-Za-z0-9_-]{43}=)'''
+secretGroup = 1
+keywords = ["fernet"]
+
+# The example env files are meant to be blank templates. A value on a secret-named variable
+# there is almost always a real credential pasted in by mistake.
+[[rules]]
+id = "secret-value-in-example-env"
+description = "A secret-named variable has a value in an example env file"
+path = '''(^|/)\.env[^/]*\.example$'''
+regex = '''(?m)^[A-Z][A-Z0-9_]*_(?:KEY|TOKEN|SECRET|PASSWORD)[ \t]*=[ \t]*["']?([^\s#"']{4,})'''
+secretGroup = 1
+keywords = ["_key", "_token", "_secret", "_password"]
+
+[allowlist]
+description = "Known findings that are already public and are handled out of band"
+# 2026-10-19: a Tavily key, a Telegram bot token and a Fernet key were committed to .env.example
+# and blanked in 613bb515. They stay in the history, so they must be treated as compromised and
+# rotated; scanning them again would only fail every run. Do NOT add new commits here to get a
+# build green: rotate the credential instead.
+commits = [
+  "9ee6c4dcc4170f4f2ef119b04c7399066f983d7d",
+  "1d49a81e46c4158b91844755b69e9c10f0e2c767",
+  "6ff9ea1a4307f3576909fab756fc8643a5c3dbc8",
+]

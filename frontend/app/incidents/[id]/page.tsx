@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/Icon";
 import { Card, EvidencePanel, Notice, SimBanner, Spinner, TacticTimeline, Transcript, VerificationPanel } from "@/components/Panels";
-import { download } from "@/lib/api";
+import { api, download } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import type { EvidenceItem, Line, TimelinePoint, Verification } from "@/lib/types";
 import { useFetch } from "@/lib/useFetch";
@@ -19,6 +19,7 @@ interface Detail {
   detect_turn: number | null;
   memory_hit_turn: number | null;
   script: string | null;
+  feedback_verdict?: string | null;
   simulation: boolean;
   scenario: string | null;
   timeline: { turn: number; stage: string; tactics: string[]; risk: number }[];
@@ -34,6 +35,22 @@ export default function IncidentPage() {
   const { data, error, loading } = useFetch<Detail>(`/api/incidents/${params.id}`);
   const [upTo, setUpTo] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [userVerdict, setUserVerdict] = useState<string | null>(null);
+
+  const currentVerdict = userVerdict ?? data?.feedback_verdict ?? null;
+
+  const submitFeedback = async (v: "scam" | "not_scam") => {
+    if (!data) return;
+    try {
+      await api(`/api/incidents/${data.id}/feedback`, {
+        method: "POST",
+        body: JSON.stringify({ verdict: v }),
+      });
+      setUserVerdict(v);
+    } catch {
+      setErr(t("common.error"));
+    }
+  };
 
   const maxTurn = useMemo(() => Math.max(0, ...(data?.transcript ?? []).map((x) => x.turn)), [data]);
   const shown = upTo ?? maxTurn;
@@ -84,6 +101,40 @@ export default function IncidentPage() {
               {t("actions.blocklist")}
             </button>
           </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sep bg-surface p-3.5">
+            <div>
+              <span className="text-callout font-medium">{t("feedback.prompt")}</span>
+              <p className="text-footnote text-label3">{t("feedback.help")}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => submitFeedback("scam")}
+                className={`min-h-tap rounded-xl px-3.5 py-1.5 text-callout font-medium transition ${
+                  currentVerdict === "scam"
+                    ? "bg-[var(--tint)] text-white shadow-sm"
+                    : "border border-sep bg-raised text-label1 hover:border-tint"
+                }`}
+                aria-pressed={currentVerdict === "scam"}
+              >
+                ✓ {t("feedback.confirmedScam")}
+              </button>
+              <button
+                type="button"
+                onClick={() => submitFeedback("not_scam")}
+                className={`min-h-tap rounded-xl px-3.5 py-1.5 text-callout font-medium transition ${
+                  currentVerdict === "not_scam"
+                    ? "bg-[var(--tint)] text-white shadow-sm"
+                    : "border border-sep bg-raised text-label1 hover:border-tint"
+                }`}
+                aria-pressed={currentVerdict === "not_scam"}
+              >
+                ✕ {t("feedback.falseAlarm")}
+              </button>
+            </div>
+          </div>
+
           {err && <Notice tone="error">{err}</Notice>}
           <p className="text-footnote text-label3">{t("common.draft")}</p>
 

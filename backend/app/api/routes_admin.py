@@ -5,9 +5,9 @@ from typing import Any
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
-from app.api.state import get_state
+from app.api.state import client_ip, get_state
 from app.guards.demo_mode import list_replays
-from app.voice.asr import voice_status
+from app.voice.asr import MAX_AUDIO_BYTES, AudioTooLarge, HttpTranscriptionASR, voice_status
 
 router = APIRouter()
 
@@ -16,6 +16,50 @@ router = APIRouter()
 async def voice(request: Request) -> dict[str, Any]:
     s = get_state(request).settings
     return voice_status(s.asr_base_url, s.tts_base_url)
+
+
+@router.post("/api/voice/transcribe")
+async def transcribe_audio(
+    request: Request,
+    language: str = "en",
+) -> dict[str, Any]:
+    """Server-side speech-to-text adapter (NVIDIA Parakeet / Nemotron-speech).
+
+    Takes audio bytes directly in the request body.
+    Audio is processed in-memory and immediately discarded; it is never written to disk.
+    """
+    st = get_state(request)
+    s = st.settings
+    ip = client_ip(request)
+    if not st.limiter.allow(f"asr_{ip}", limit=30, window_s=60):
+        raise HTTPException(429, "Too many transcription requests. Please wait a moment.")
+
+    audio_bytes = await request.body()
+    if not audio_bytes:
+        raise HTTPException(400, "Empty audio payload.")
+    if len(audio_bytes) > MAX_AUDIO_BYTES:
+        raise HTTPException(
+            413, f"Audio clip exceeds maximum size of {MAX_AUDIO_BYTES // (1024 * 1024)}MB."
+        )
+
+    if not s.asr_base_url:
+        raise HTTPException(
+            501,
+            "Server-side NVIDIA ASR endpoint not configured. Set ASR_BASE_URL or use browser Web Speech fallback.",
+        )
+
+    asr = HttpTranscriptionASR(
+        base_url=s.asr_base_url,
+        model="nvidia/parakeet-ctc-1.1b",
+        api_key=s.nebius_api_key,
+    )
+    try:
+        text = await asr.transcribe(audio_bytes, language)
+        return {"text": text, "adapter": asr.name, "language": language}
+    except AudioTooLarge:
+        raise HTTPException(413, "Audio clip too large.") from None
+    except Exception as ex:
+        raise HTTPException(502, f"ASR transcription service error: {str(ex)[:200]}") from ex
 
 
 @router.get("/healthz")

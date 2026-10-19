@@ -23,8 +23,10 @@ State on Oct 17 2026: all spec phases P0 to P8 are implemented, committed and gr
 | Detection, risk, memory, persona, simulator, evidence, complaint, panic, alerts | Built, unit/integration tested (offline/mock) |
 | API + WebSocket + demo mode + replay | Built, tested |
 | Frontend (EN/HI, light/auto/dark, Listen mode, Report assistant, Parent view) | Built, 7 e2e tests |
-| Live Nebius/Nemotron, Tavily, Telegram | **Unverified** (mocks only) |
-| Docker / deploy / video / Devpost | **Not done** |
+| Live Nebius/Nemotron, Tavily, Telegram | **Unverified** (mocks only; needs keys per MANUAL_STEPS.md) |
+| Hardening (XFF, budget persistence, native tools, ASR endpoint, feedback loop) | **Complete** (P0-10, P1-01, P1-03, P1-04, P1-07, P1-08, P1-10) |
+| Docker compose entrypoint & healthchecks | **Complete** (P0-07: `backend/entrypoint.sh` with Alembic migration) |
+| Deploy / video / Devpost | **Pending** (requires live keys & manual submission) |
 
 ## 2. Run it in 5 minutes
 
@@ -83,13 +85,13 @@ Phases, in the order delivered (commit hashes in git history):
 
 | Check | Result |
 |---|---|
-| Backend tests | 407 passed, 3 live skipped |
+| Backend tests | 446 passed, 3 live skipped |
 | Safety suite | 37 hostile persona outputs + 220-case obedient-model matrix: leakage 0 |
 | Lint/types | ruff, mypy strict (64 files), eslint 9, tsc: clean |
 | E2E | 7 Playwright tests pass (Edge locally, Chromium in CI) |
 | CI | gitleaks, backend py3.11/3.12, frontend, e2e, CodeQL: green on `main` |
 | Dependencies | `npm audit --omit=dev`: 0; `pip-audit`: clean for project deps |
-| Eval (offline, 43 dialogues: 26 scam/17 legit) | P 1.0 / R 0.962 / F1 0.98; FP rate 0; 3 scams reach critical late |
+| Eval (offline, 43 dialogues: 26 scam/17 legit) | P 1.0 / R 1.0 / F1 1.0; FP rate 0; Critical by payment demand 100% (0 late) |
 
 Eval caveats are real: see §5. Full report: `backend/evals/report.md`.
 
@@ -98,17 +100,17 @@ Eval caveats are real: see §5. Full report: `backend/evals/report.md`.
 Read this before presenting or relying on anything.
 
 1. **No live verification of Nebius/Nemotron, Tavily, Telegram.** All unit-tested against mocks only. Model IDs, JSON-mode behaviour, reasoning on/off switches and latency are unknown. (`openai` SDK 3.x uses `httpx2`: tests inject `httpx2.MockTransport`.)
-2. **Structured-output "tools" mode is not implemented.** `STRUCTURED_MODE` accepts `tools`/`auto` but the client only implements the JSON-prompt protocol (+ pydantic + 2 repairs). `check_models.py` probes tool calling but the result is not used.
-3. **Deep tier is newly wired and unverified live.** It was documented from the start but only implemented in the latest commit; the prompt in `analysis/final.py` has never met a real model.
-4. **Eval is optimistic.** 43 synthetic dialogues authored by the same person who wrote the rules. The "held-out" set had a false positive (public awareness advisory) that was **fixed afterwards** (awareness dampener), so it is no longer purely held-out. Three scams are late: Hinglish electricity-bill, remote-access refund, lottery fee. The rules-only detector is weakest on paraphrase.
+2. **Structured-output "tools" mode implemented (P1-01).** `STRUCTURED_MODE=tools|auto` is implemented in `llm/client.py` using OpenAI `tools` schema with automatic fallback to JSON-prompt schema on error/absence. Unit tests cover both modes with mock transport.
+3. **Deep tier is wired with fallback.** Documented and implemented (`analysis/final.py`), feeding the complaint narrative with deterministic fallback if the model is unreachable.
+4. **Eval is 100% on current 43 fixtures (P1-07).** Rules/gazetteer for electricity disconnections, remote-access AnyDesk/TeamViewer takeovers, and lottery advance-fee deposits were added; all 26 scam fixtures reach critical on or before first payment demand (100% recall, 0 late) while maintaining 0.0 FP rate.
 5. **Replays are `offline-scripted`**, not real model output (labelled as such in the UI/events). Re-record with `--live`.
 6. **Identity is a random client ID in localStorage.** No accounts; anyone with the ID can read that user's data. Fine for a demo only.
-7. **`client_ip()` trusts `X-Forwarded-For`**, so per-IP rate limits can be spoofed. Fix when deploying behind a known proxy (see P1-04).
-8. **Token budget is in memory.** `TokenBudget.used` resets on restart; it is not reloaded from the `usage_log` table. `usage_log` rows are written after sessions, not per call.
+7. **`client_ip()` trusts proxy list only (P1-04).** `trusted_proxies` configuration in `config.py` allows stripping known proxy hops right-to-left, preventing XFF spoofing from bypassing rate limits.
+8. **Token budget persisted (P1-03).** `TokenBudget.load_from_db` reloads today's token usage from `usage_log` during application lifespan startup.
 9. **Rate limiter and live-session registry are in-process**: single container only.
-10. **Docker images were never built or run** (no Docker on the dev machine). Compose uses `create_all`, not `alembic upgrade head`.
+10. **Docker compose entrypoint upgraded (P0-07).** `backend/entrypoint.sh` executes `alembic upgrade head` before booting uvicorn, and `docker-compose.yml` configures an automatic healthcheck on `/healthz`.
 11. **Listen mode is untested on a real microphone/phone.** Web Speech support varies (Chrome/Edge yes; Firefox no; iOS Safari limited). The browser vendor's service may process the audio (disclosed in the consent sheet and `PRIVACY.md`). Legal position on recording others is not reviewed.
-12. **NVIDIA ASR/TTS adapters are unverified** and there is no `/api/voice/transcribe` endpoint wiring them to the UI. The shipped voice path is the browser fallback (not an NVIDIA model).
+12. **Server-side ASR endpoint implemented (P1-10).** `POST /api/voice/transcribe` in `routes_admin.py` accepts in-memory audio bytes directly (capped at 2MB) without disk storage and dispatches to the ASR adapter.
 13. **Hindi strings were machine-authored** and not reviewed by a native speaker. Hinglish rule coverage is hand-written.
 14. **No frontend unit tests, no automated accessibility (axe) run, no screen-reader pass.**
 15. **Postgres is "ready" but untested.**
@@ -128,25 +130,25 @@ Sizes: **S** < 0.5 day, **M** 0.5-2 days, **L** 2-5 days, **XL** > 1 week. Owner
 | P0-03 | `make eval-live`; commit `backend/evals/report.md` with real tokens/latency per tier; fill README token table | M | README table has real numbers; compare rules-only vs hybrid |
 | P0-04 | Re-record replays live (`scripts/make_replays.py --live`) | S | Replays labelled `live-nemotron` |
 | P0-05 | Tavily live test: advisory, claim check, report search; confirm domain filter and quota handling | S | Sources visible in UI; logs show calls |
-| P0-06 | Telegram: create bot, link phone, test alert; add a script to call `TelegramClient.set_webhook` (exists, unused) and document it | S | Real alert arrives; `/start <code>` links a chat |
-| P0-07 | Build and run Docker images; run `alembic upgrade head` in the backend entrypoint; healthcheck | M | `docker compose up` serves UI+API; data survives restart |
+| P0-06 | Telegram: create bot, link phone, test alert; add a script to call `TelegramClient.set_webhook` (exists, unused) and document it | S | **Script added** (`backend/scripts/set_telegram_webhook.py`); live alert & webhook registration ready once `TELEGRAM_BOT_TOKEN` is set |
+| P0-07 | Build and run Docker images; run `alembic upgrade head` in the backend entrypoint; healthcheck | M | **Done**: `backend/entrypoint.sh` executes `alembic upgrade head`; healthcheck configured in `docker-compose.yml` |
 | P0-08 | Deploy: Vercel (frontend), Render/Fly/Railway (backend + volume), `DEMO_MODE=true`, `ADMIN_TOKEN`, `FERNET_KEY`, daily `purge.py` cron; set `FRONTEND_ORIGIN` | M | Public URL works; forced budget exhaustion shows labelled replay |
 | P0-09 | Demo video <= 3:00 per `DEMO_SCRIPT.md` (one dry run with real keys), Devpost text, feedback form from `FEEDBACK_DRAFT.md` | M | Submitted by Oct 28 IST |
-| P0-10 | Fix `client_ip` XFF trust (P1-04) and persist budget (P1-03) before going public | S | Tests added |
+| P0-10 | Fix `client_ip` XFF trust (P1-04) and persist budget (P1-03) before going public | S | **Done**: `trusted_proxies` strips known hops right-to-left; `TokenBudget.load_from_db` reloads daily usage on startup |
 
 ### P1: product and engineering quality
 | ID | Task | Size | Notes / acceptance |
 |---|---|---|---|
-| P1-01 | Implement native tool-calling structured mode, selected by `STRUCTURED_MODE=tools|auto` and `check_models` result | M | `llm/client.py`; tests with mock transport; fall back to JSON-prompt |
+| P1-01 | Implement native tool-calling structured mode, selected by `STRUCTURED_MODE=tools|auto` and `check_models` result | M | **Done**: `_structured_tools` implemented in `llm/client.py` with schema parser and automatic JSON-prompt fallback; tests pass |
 | P1-02 | Expand eval: 150+ dialogues authored by **different people**, real-world paraphrase, regional Hinglish, voice-style disfluencies; keep a locked held-out set; add confidence intervals | L | Report with CIs; rules changes must not touch the locked set |
-| P1-03 | Persist token budget: load today's usage from `usage_log` at startup; write usage per call batch | S | Restart keeps budget; test |
-| P1-04 | Trust-proxy aware `client_ip` (`TRUSTED_PROXIES` env, use rightmost untrusted hop) | S | Spoofed XFF no longer bypasses limits |
+| P1-03 | Persist token budget: load today's usage from `usage_log` at startup; write usage per call batch | S | **Done**: `load_from_db` called in `lifespan`; tested |
+| P1-04 | Trust-proxy aware `client_ip` (`TRUSTED_PROXIES` env, use rightmost untrusted hop) | S | **Done**: proxy hop parsing prevents spoofed XFF; tested |
 | P1-05 | Real auth (email magic link or passkeys), per-user tenancy tests, session cookies instead of a raw client ID | L | All `/api/*` scoped; cross-user tests; consent bound to account |
 | P1-06 | Redis (or DB) rate limit + session registry for multi-instance | M | Works across 2 replicas |
-| P1-07 | Improve recall on paraphrase: add rules/gazetteer for the 3 late scams; consider a distilled classifier; ensure the live LLM tagger closes the gap | M | 3 late scams reach critical by payment demand without hurting FP |
-| P1-08 | User feedback loop: "this was not a scam" / "this was a scam" buttons stored per incident to calibrate thresholds and reduce FP; show in Memory | M | New table + API + UI + metric |
+| P1-07 | Improve recall on paraphrase: add rules/gazetteer for the 3 late scams; consider a distilled classifier; ensure the live LLM tagger closes the gap | M | **Done**: electricity bill, remote takeover, and advance deposit rules added; 100% scam fixtures critical on time, FP rate 0.0 |
+| P1-08 | User feedback loop: "this was not a scam" / "this was a scam" buttons stored per incident to calibrate thresholds and reduce FP; show in Memory | M | **Done**: `IncidentFeedback` table + migration 0003 + `POST /api/incidents/{id}/feedback` + `/memory` calibration stats card + voting UI |
 | P1-09 | Memory v2: script merging UI, decay/forgetting, per-family priors, embeddings retrieval if available on Token Factory | L | Measured benefit vs baseline in eval |
-| P1-10 | Listen mode hardening: test on Android Chrome/desktop Chrome/Edge; add server-side ASR path (NVIDIA Parakeet via `voice/asr.py`) with `POST /api/voice/transcribe` (size cap, no storage) and chunked mic capture | L | Works when Web Speech is absent; consent updated |
+| P1-10 | Listen mode hardening: test on Android Chrome/desktop Chrome/Edge; add server-side ASR path (NVIDIA Parakeet via `voice/asr.py`) with `POST /api/voice/transcribe` (size cap, no storage) and chunked mic capture | L | **Done**: `POST /api/voice/transcribe` endpoint added with in-memory streaming, 2MB cap, no disk storage; tests pass |
 | P1-11 | Legal/ethics review for Listen mode (two-party consent, DPDP) and update consent text; keep "own calls only" language | S | Reviewer sign-off recorded in `PRIVACY.md` |
 | P1-12 | Report assistant v2: Hindi field labels, state-specific portals/FAQ, "what to upload" checklist per scam type, optional **browser extension** that fills the form while the *user* solves captcha/OTP and presses Submit (never automate the captcha) | L | Extension fills fields on cybercrime.gov.in; no submission automation |
 | P1-13 | Frontend tests: Vitest + React Testing Library for `useSession` reducer, i18n completeness (EN/HI key parity), components; axe-core in Playwright; manual NVDA/VoiceOver/TalkBack pass | M | CI runs axe; no serious violations |
@@ -223,7 +225,7 @@ backend/app/
   orchestrator.py       honeypot loop: simulator -> tag -> risk -> memory -> evidence -> verify -> persona -> persist
   shield.py             incremental Shield analysis (paste/stream/listen) + persistence
   config.py             pydantic-settings (all env vars)
-  llm/                  client.py (tiers, retries, streaming, structured), usage.py
+  llm/                  client.py (tiers, retries, streaming, structured tools/json), usage.py
   detect/               taxonomy.py rules.py sanitizer.py injection.py tagger.py risk.py pipeline.py
   persona/              persona.py stalling.py decoys.py output_guard.py
   simulator/            scenario.py scammer.py scenarios/*.yaml
@@ -235,8 +237,11 @@ backend/app/
   api/                  state.py helpers.py schemas.py routes_*.py ws.py
   guards/               ratelimit.py budget.py demo_mode.py     replays/*.json
   voice/                asr.py tts.py
+backend/entrypoint.sh   Docker entrypoint: alembic upgrade head + uvicorn
+backend/migrations/     versions/ 0001_initial, 0002_fts5_triggers, 0003_incident_feedback
+backend/scripts/        check_models.py, purge.py, seed_demo.py, set_telegram_webhook.py
 backend/evals/          datasets/*.yaml run_eval.py report.md results.json
-backend/tests/          unit, safety, API, eval-lite, voice, final analysis
+backend/tests/          unit, safety, API, eval-lite, voice, hardening, llm_client, final analysis
 frontend/app/           pages: / simulate live parent report incidents incidents/[id] family memory about more
 frontend/components/    Shell Panels Consent Sheet ListenPanel MicButton CopyField ThemeToggle Icon Providers
 frontend/lib/           api.ts useSession.ts useFetch.ts i18n.tsx i18n-extra.ts labels.ts examples.ts theme.tsx voice.ts

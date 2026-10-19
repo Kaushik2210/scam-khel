@@ -75,7 +75,9 @@ def neutralise(text: str) -> str:
 def wrap_untrusted(text: str, tag: str = "untrusted_utterance") -> str:
     """Delimit untrusted text so it can't close the tag or masquerade as a system message."""
     safe = re.sub(rf"</?\s*{tag}\s*>", "", text, flags=re.IGNORECASE)
-    safe = re.sub(r"<\|[^>]*\|>", "", safe)
+    # Bounded: an open `[^>]*` is retried from every "<|" and scans to the end each time, which
+    # is quadratic on input like "<|<|<|...". Chat-template tokens are far shorter than 128.
+    safe = re.sub(r"<\|[^>]{0,128}\|>", "", safe)
     return f"<{tag}>\n{safe}\n</{tag}>"
 
 

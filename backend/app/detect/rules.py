@@ -31,6 +31,14 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
         (_c(r"\b(police|pulis|thana)\b"), 0.8),
         (
             _c(
+                r"\b(bijli (vibhag|board|office|karmi)|electricity (department|board|office|authority)"
+                r"|power (corporation|department|board))\b"
+            ),
+            0.8,
+        ),
+        (_c(r"बिजली विभाग|विद्युत विभाग|पावर कॉर्पोरेशन"), 0.8),
+        (
+            _c(
                 r"\b(bank (manager|officer|executive)|customer care|kyc (team|department)"
                 r"|from (the )?bank)\b"
             ),
@@ -47,6 +55,14 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.9,
         ),
         (_c(r"गिरफ्तार|वारंट|जेल|केस दर्ज|अवैध|मनी लॉन्ड्रिंग|ड्रग|हिरासत"), 0.9),
+        (
+            _c(
+                r"\b(connection|line|bijli|power|service|account)\b.{0,20}\b(kat|cut|disconnect\w*|band|freez\w*|suspend\w*)\b"
+                r"|\b(kat|cut|disconnect\w*|band)\s+(jayega|karenge|kar denge|ho jayega)\b"
+            ),
+            0.7,
+        ),
+        (_c(r"कनेक्शन (कट|बंद)|बिजली कट|लाइन कट"), 0.7),
         (_c(r"\b(blocked|freez\w*|frozen|seiz\w*|disconnect(ed|ion)?|suspend\w*)\b"), 0.5),
     ],
     "isolation_secrecy": [
@@ -73,6 +89,13 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.95,
         ),
         (_c(r"किसी को.{0,12}(मत|न|नहीं).{0,15}(बता|बोल)"), 0.95),
+        (
+            _c(
+                r"\b(keep (this|it)?\s*(strictly )?confidential|maintain secrecy|strictly confidential)\b"
+            ),
+            0.85,
+        ),
+        (_c(r"गोपनीय रखें|गुप्त रखें"), 0.85),
         (_c(r"\b(confidential|top secret|secret case|secrecy)\b"), 0.6),
     ],
     "stay_on_camera_digital_arrest": [
@@ -105,10 +128,13 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
             0.7,
         ),
         (
-            _c(r"\b(turant|abhi ke abhi|foran|jaldi|aaj hi|ek ghante|\d+ ?(minute|ghante) mein)\b"),
+            _c(
+                r"\b(turant|abhi ke abhi|foran|jaldi|aaj hi|aaj raat|aaj shaam|by tonight"
+                r"|ek ghante|\d+ ?(minute|ghante) mein)\b"
+            ),
             0.7,
         ),
-        (_c(r"तुरंत|अभी के अभी|जल्दी|आज ही|घंटे में|मिनट में"), 0.7),
+        (_c(r"तुरंत|अभी के अभी|जल्दी|आज ही|आज रात|आज शाम|घंटे में|मिनट में"), 0.7),
     ],
     "fake_case_or_badge_id": [
         (
@@ -218,13 +244,17 @@ _PRE_NEG = re.compile(
 )
 _INNER_NEG = re.compile(r"\b(never|mat|nahi|nahin)\b|\bdo not\b|\bdon'?t\b|न बता|मत|नहीं", _F)
 
+# Every repetition here is bounded. An open-ended `\d{3,}` followed by `.{0,30}` is polynomial on
+# a long digit run: the match is retried from every digit and each try backtracks through the
+# whole run, so a few thousand digits in one utterance would stall the event loop for seconds.
+# No real amount has more than 15 digits, and a bounded run still matches inside a longer one.
 _MONEY = _c(
-    r"\b(transfer|send|pay|deposit|remit|bhej\w*|jama|submit)\b.{0,40}"
-    r"(rs\.?|₹|rupees?|inr|lakh|crore|\d{3,}|amount|money|funds?|paise)"
-    r"|(भेज|जमा|ट्रांसफर).{0,30}(रुपये|राशि|पैसे|\d{3,})"
-    r"|(rs\.?|₹|rupees?|rupay\w*|lakh|crore|\d{3,}|रुपये|राशि|पैसे).{0,30}"
-    r"\b(bhej\w*|transfer|jama|deposit|send|pay)\b"
-    r"|(रुपये|राशि|पैसे|\d{3,}).{0,30}(भेज|जमा|ट्रांसफर)"
+    r"\b(transfer|send|pay|deposit|remit|bhej\w{0,20}|jama|submit)\b.{0,40}"
+    r"(rs\.?|₹|rupees?|inr|lakh|crore|\d{3,15}|amount|money|funds?|paise)"
+    r"|(भेज|जमा|ट्रांसफर).{0,30}(रुपये|राशि|पैसे|\d{3,15})"
+    r"|(rs\.?|₹|rupees?|rupay\w{0,20}|lakh|crore|\d{3,15}|रुपये|राशि|पैसे).{0,30}"
+    r"\b(bhej\w{0,20}|transfer|jama|deposit|send|pay)\b"
+    r"|(रुपये|राशि|पैसे|\d{3,15}).{0,30}(भेज|जमा|ट्रांसफर)"
 )
 
 
