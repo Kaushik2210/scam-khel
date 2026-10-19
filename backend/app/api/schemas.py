@@ -48,4 +48,3 @@ class PanicIn(BaseModel):
 class FeedbackIn(BaseModel):
     verdict: Literal["scam", "not_scam"]
     notes: str = Field("", max_length=500)
-

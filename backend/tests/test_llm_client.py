@@ -205,4 +205,3 @@ async def test_structured_native_tool_calling_falls_back_to_json_prompt():
     out = await c.structured("fast", [{"role": "user", "content": "x"}], Out)
     assert out.a == 99
     assert route.call_count == 2
-

@@ -154,4 +154,3 @@ async def test_token_budget_restores_from_db_across_restart(tmp_path):
     assert budget.used == 600  # (150+50) + (300+100)
     assert budget.status()["used"] == 600
     await engine.dispose()
-

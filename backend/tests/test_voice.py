@@ -89,4 +89,3 @@ def test_transcribe_endpoint_rejects_oversized_audio(tmp_path):
             headers={"Content-Type": "audio/wav"},
         )
         assert r.status_code == 413
-

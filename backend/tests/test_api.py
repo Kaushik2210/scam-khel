@@ -387,4 +387,3 @@ def test_incident_feedback_loop(client):
     assert stats["confirmed_scams"] == 1
     assert stats["false_alarms"] == 0
     assert stats["total_feedback"] == 1
-

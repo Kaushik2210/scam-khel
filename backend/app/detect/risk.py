@@ -35,7 +35,12 @@ COMBOS: list[tuple[str, set[str], int]] = [
     ),
     (
         "otp_request",
-        {"remote_access_app_request", "authority_impersonation", "fear_arrest_threat", "urgency_deadline"},
+        {
+            "remote_access_app_request",
+            "authority_impersonation",
+            "fear_arrest_threat",
+            "urgency_deadline",
+        },
         12,
     ),
     (
@@ -45,7 +50,12 @@ COMBOS: list[tuple[str, set[str], int]] = [
     ),
     (
         "link_or_apk_push",
-        {"urgency_deadline", "fear_arrest_threat", "authority_impersonation", "verification_fee_or_deposit"},
+        {
+            "urgency_deadline",
+            "fear_arrest_threat",
+            "authority_impersonation",
+            "verification_fee_or_deposit",
+        },
         10,
     ),
 ]
@@ -113,11 +123,12 @@ class RiskEngine:
             s.tactics.get("authority_impersonation", 0) >= LE_AUTHORITY_CONF
             and s.tactics.get("urgency_deadline", 0) >= STRONG_CONF
         )
-        remote_takeover = (
-            s.tactics.get("remote_access_app_request", 0) >= STRONG_CONF
-            and (s.tactics.get("otp_request", 0) >= STRONG_CONF or s.payment_demand_seen)
+        remote_takeover = s.tactics.get("remote_access_app_request", 0) >= STRONG_CONF and (
+            s.tactics.get("otp_request", 0) >= STRONG_CONF or s.payment_demand_seen
         )
-        if (s.payment_demand_seen and (coercive or le_urgent) and len(strong) >= 2) or remote_takeover:
+        if (
+            s.payment_demand_seen and (coercive or le_urgent) and len(strong) >= 2
+        ) or remote_takeover:
             score = max(score, CRITICAL)
             reasons.append("payment demand under coercion / takeover")
 

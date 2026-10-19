@@ -21,9 +21,17 @@ from app.config import get_settings
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="Configure Telegram Bot webhook.")
-    parser.add_argument("--url", help="Public HTTPS URL for webhook (e.g. https://api.example.com/api/telegram/webhook)")
-    parser.add_argument("--secret", help="Secret token for Telegram webhook validation (defaults to ADMIN_TOKEN in env)")
-    parser.add_argument("--token", help="Telegram bot token (defaults to TELEGRAM_BOT_TOKEN in env)")
+    parser.add_argument(
+        "--url",
+        help="Public HTTPS URL for webhook (e.g. https://api.example.com/api/telegram/webhook)",
+    )
+    parser.add_argument(
+        "--secret",
+        help="Secret token for Telegram webhook validation (defaults to ADMIN_TOKEN in env)",
+    )
+    parser.add_argument(
+        "--token", help="Telegram bot token (defaults to TELEGRAM_BOT_TOKEN in env)"
+    )
     parser.add_argument("--delete", action="store_true", help="Remove existing webhook")
     args = parser.parse_args()
 
@@ -32,8 +40,13 @@ async def main() -> None:
     secret = args.secret or settings.admin_token
 
     if not token:
-        print("ERROR: TELEGRAM_BOT_TOKEN is not set in .env or passed via --token.", file=sys.stderr)
-        print("Create a bot via @BotFather and set TELEGRAM_BOT_TOKEN. See docs/MANUAL_STEPS.md.", file=sys.stderr)
+        print(
+            "ERROR: TELEGRAM_BOT_TOKEN is not set in .env or passed via --token.", file=sys.stderr
+        )
+        print(
+            "Create a bot via @BotFather and set TELEGRAM_BOT_TOKEN. See docs/MANUAL_STEPS.md.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     client = TelegramClient(token)
@@ -51,7 +64,10 @@ async def main() -> None:
     url = args.url
     if not url:
         print("ERROR: --url is required unless --delete is specified.", file=sys.stderr)
-        print("Example: python scripts/set_telegram_webhook.py --url https://my-app.onrender.com/api/telegram/webhook", file=sys.stderr)
+        print(
+            "Example: python scripts/set_telegram_webhook.py --url https://my-app.onrender.com/api/telegram/webhook",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     if not url.startswith("https://"):
@@ -63,7 +79,9 @@ async def main() -> None:
         print("Telegram webhook configured successfully!")
         info = await client._call("getWebhookInfo", {})
         result = info.get("result", {})
-        print(f"Current webhook status: URL={result.get('url')} (pending updates: {result.get('pending_update_count', 0)})")
+        print(
+            f"Current webhook status: URL={result.get('url')} (pending updates: {result.get('pending_update_count', 0)})"
+        )
     except TelegramError as e:
         print(f"Failed to set webhook: {e}", file=sys.stderr)
         sys.exit(1)
