@@ -139,12 +139,13 @@ RULES: dict[str, list[tuple[re.Pattern[str], float]]] = {
     "fake_case_or_badge_id": [
         (
             _c(
-                r"\b(case|fir|badge|warrant|ref(erence)?)\s*(no\.?|number|id)?\s*[:#-]?\s*"
+                r"\b(case|fir|badge|warrant|ref(erence)?)"
+                r"\s{0,10}(?:(?:no\.?|number|id)\s{0,10})?[:#-]?\s{0,10}"
                 r"[A-Z]{0,5}[-/]?\d{3,}[A-Z0-9/-]*"
             ),
             0.8,
         ),
-        (_c(r"(केस|एफआईआर|बैज)\s*(नंबर|संख्या)?\s*[:#-]?\s*[A-Z0-9/-]{4,}"), 0.8),
+        (_c(r"(केस|एफआईआर|बैज)\s{0,10}(?:(?:नंबर|संख्या)\s{0,10})?[:#-]?\s{0,10}[A-Z0-9/-]{4,}"), 0.8),
     ],
     "document_demand": [
         (

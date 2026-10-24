@@ -27,7 +27,8 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "account",
         re.compile(
-            r"\b(?:account|a/c|acct)(?:\s*(?:no\.?|number))?\s*[:#-]?\s*([A-Z]{0,4}\d{9,18})\b", _F
+            r"\b(?:account|a/c|acct)(?:\s{0,10}(?:no\.?|number))?\s{0,10}[:#-]?\s{0,10}([A-Z]{0,4}\d{9,18})\b",
+            _F,
         ),
     ),
     ("apk", re.compile(r"[\w./:-]*\b[\w-]+\.apk\b", _F)),
@@ -35,14 +36,16 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "badge_id",
         re.compile(
-            r"\b(?:badge|employee|officer|id)\s*(?:no\.?|number|id)?\s*[:#-]?\s*([A-Z]{2,5}-?\d{3,8})\b",
+            r"\b(?:badge|employee|officer|id)\s{0,10}(?:(?:no\.?|number|id)\s{0,10})?[:#-]?\s{0,10}"
+            r"([A-Z]{2,5}-?\d{3,8})\b",
             _F,
         ),
     ),
     (
         "case_id",
         re.compile(
-            r"\b(?:case|fir|reference|ref|warrant)\s*(?:no\.?|number|id)?\s*[:#-]?\s*([A-Z]{2,5}-?\d{3,8}|\d{4,8})\b",
+            r"\b(?:case|fir|reference|ref|warrant)\s{0,10}(?:(?:no\.?|number|id)\s{0,10})?[:#-]?\s{0,10}"
+            r"([A-Z]{2,5}-?\d{3,8}|\d{4,8})\b",
             _F,
         ),
     ),
