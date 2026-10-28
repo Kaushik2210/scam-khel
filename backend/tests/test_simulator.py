@@ -140,3 +140,14 @@ async def test_second_exposure_is_flagged_no_later_and_persisted(db):
     # utterances stored encrypted, retrievable
     rows = await repo.get_utterances(db, cipher, first.session_id)
     assert rows and any("KYC" in text for _, text in rows)
+
+
+@pytest.mark.asyncio
+async def test_scammer_escalates_instead_of_repeating_payment_line():
+    from app.simulator.scammer import ScammerSim
+
+    sim = ScammerSim(load_scenario("digital-arrest-parcel"))
+    lines = [(await sim.next_line([])).text for _ in range(13)]
+    tail = lines[-4:]
+    assert len(set(tail)) >= 3  # no verbatim loop
+    assert all("(SIMULATION)" in t for t in tail)
