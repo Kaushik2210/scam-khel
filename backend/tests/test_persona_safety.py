@@ -149,3 +149,15 @@ async def test_system_prompt_contains_only_decoy_data():
     sp = system_prompt(PersonaConfig(), MOVES[0])
     assert "decoy@examplebank" in sp and "9999-DECOY-0001" in sp
     assert find_violations(sp.split("Next move")[0].replace("decoy@examplebank", "")) != [] or True
+
+
+@pytest.mark.asyncio
+async def test_scripted_fallback_does_not_repeat_a_line_until_exhausted():
+    from app.persona.persona import Persona
+    from app.persona.stalling import MOVES
+
+    p = Persona(llm=None, seed=3)
+    outs = [(await p.reply("Send money now", [], set())).text for _ in range(8)]
+    pool = {ln for m in MOVES for ln in m.lines}
+    assert set(outs) <= pool
+    assert len(set(outs)) >= 6

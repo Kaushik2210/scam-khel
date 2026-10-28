@@ -73,6 +73,7 @@ class Persona:
         self.cfg = config or PersonaConfig()
         self.rng = random.Random(seed)  # noqa: S311
         self.recent_moves: list[str] = []
+        self.used_lines: set[str] = set()
         self.turn = 0
 
     async def reply(
@@ -103,8 +104,11 @@ class Persona:
             except LLMError as e:
                 log.warning("persona_llm_failed_using_script", error=str(e)[:200])
         if not raw:
-            raw = self.rng.choice(move.lines)  # scripted fallback keeps the honeypot alive
+            # scripted fallback keeps the honeypot alive; prefer lines not yet used this call
+            fresh = [ln for ln in move.lines if ln not in self.used_lines] or list(move.lines)
+            raw = self.rng.choice(fresh)
 
+        self.used_lines.add(raw)
         g = guard(raw, self.rng)
         if not g.ok:
             log.warning("persona_output_blocked", violations=g.violations)
