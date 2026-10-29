@@ -156,8 +156,11 @@ class LLMClient:
         }
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
-        if extra:
-            kwargs["extra_body"] = extra
+        body = dict(extra or {})
+        if self.s.llm_disable_thinking:
+            body.setdefault("chat_template_kwargs", {"enable_thinking": False})
+        if body:
+            kwargs["extra_body"] = body
 
         last: Exception | None = None
         for attempt in range(self.s.llm_max_retries + 1):
@@ -276,6 +279,8 @@ class LLMClient:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if self.s.llm_disable_thinking:
+            kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
         try:
             t0 = time.perf_counter()
             resp = await self.client.chat.completions.create(**kwargs)

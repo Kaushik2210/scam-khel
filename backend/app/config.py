@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     model_deep: str = ""
     structured_mode: Literal["auto", "json_prompt", "tools"] = "json_prompt"
     llm_timeout_s: float = 60.0
+    # Reasoning models can spend the whole token budget on hidden thinking and return nothing.
+    llm_disable_thinking: bool = False
     llm_max_retries: int = 4
     llm_offline: bool = False
 

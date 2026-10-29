@@ -205,3 +205,15 @@ async def test_structured_native_tool_calling_falls_back_to_json_prompt():
     out = await c.structured("fast", [{"role": "user", "content": "x"}], Out)
     assert out.a == 99
     assert route.call_count == 2
+
+
+async def test_disable_thinking_sends_template_kwarg_only_when_enabled():
+    on = Route([httpx.Response(200, json=completion("hi"))])
+    c, _ = mk(on, llm_disable_thinking=True)
+    await c.chat("fast", [{"role": "user", "content": "yo"}])
+    assert b'"enable_thinking":false' in on.bodies[0].replace(b" ", b"")
+
+    off = Route([httpx.Response(200, json=completion("hi"))])
+    c2, _ = mk(off)
+    await c2.chat("fast", [{"role": "user", "content": "yo"}])
+    assert b"enable_thinking" not in off.bodies[0]

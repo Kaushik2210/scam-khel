@@ -21,6 +21,22 @@ DISENGAGE = {
     "hinglish": "Main isse upar escalate kar raha hoon. Alvida. (SIMULATION)",
 }
 
+# Used once a stage's scripted lines run out, so the caller escalates instead of looping verbatim.
+PRESSURE = {
+    "en": [
+        "Every minute of delay adds to your charges. Transfer now.",
+        "My supervisor is waiting on the line. Do you want this case closed or not?",
+        "Do not disconnect. Stay on camera and complete the payment.",
+        "This is your last chance before the warrant is issued.",
+    ],
+    "hinglish": [
+        "Har minute ki der se aapke charges badh rahe hain. Abhi transfer kijiye.",
+        "Mere supervisor line par hain. Case band karwana hai ya nahi?",
+        "Call mat kaatiye. Camera on rakhiye aur payment poora kijiye.",
+        "Warrant nikalne se pehle ye aapka aakhri mauka hai.",
+    ],
+}
+
 
 @dataclass
 class ScammerTurn:
@@ -54,6 +70,9 @@ class ScammerSim:
         st = self.sc.stages[self.stage_idx]
         i = self.line_idx.get(st.id, 0)
         self.line_idx[st.id] = i + 1
+        if i >= len(st.lines) and st.id == "payment":
+            pool = PRESSURE["en" if self.sc.language == "en" else "hinglish"]
+            return pool[(i - len(st.lines)) % len(pool)] + " (SIMULATION)"
         return self.sc.render(st.lines[min(i, len(st.lines) - 1)])
 
     async def next_line(self, history: list[tuple[str, str]]) -> ScammerTurn:

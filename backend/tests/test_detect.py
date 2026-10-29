@@ -277,3 +277,22 @@ async def test_public_awareness_advisory_is_not_flagged_but_prefixed_demand_stil
         "Transfer Rs 90,000 to the RBI safe account now."
     )
     assert (await analyze_dialogue([{"s": "caller", "t": attack}])).peak >= 85
+
+
+@pytest.mark.asyncio
+async def test_llm_only_secrecy_tag_dropped_for_birthday_surprise():
+    from app.detect.tagger import tag_utterance
+
+    def handler(tier, messages):
+        return (
+            '{"tactics":[{"id":"isolation_secrecy","confidence":0.9,"evidence_span":"mat batana"}]}'
+        )
+
+    from app.config import Settings
+    from app.llm.client import LLMClient
+
+    llm = LLMClient(Settings(_env_file=None, model_fast="f"), offline_handler=handler)
+    ok = await tag_utterance("Papa ko mat batana, birthday surprise hai. 500 bhej dena.", llm)
+    assert "isolation_secrecy" not in {t.id for t in ok.tactics}
+    bad = await tag_utterance("Papa ko mat batana, ye case secret hai. Paise bhej do.", llm)
+    assert "isolation_secrecy" in {t.id for t in bad.tactics}

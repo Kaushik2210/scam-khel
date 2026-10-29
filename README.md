@@ -120,16 +120,16 @@ Measured by `make eval` (offline, deterministic), never hand-written. Full repor
 | Metric | Result |
 |---|---|
 | Eval set | 43 dialogues (26 scam / 17 legit; EN, Hindi, Hinglish) |
-| Precision / recall / F1 @ high (≥70), all | 1.0 / 1.0 / 1.0 |
+| Precision / recall / F1 @ high (≥70), all | 0.929 / 1.0 / 0.963 |
 | Same, held-out set only (21) | 1.0 / 1.0 / 1.0 |
-| False-positive rate on legit (all / held-out) | 0.0 / 0.0 |
-| Mean scammer turns to reach high | 2.27 |
+| False-positive rate on legit (all / held-out) | 0.118 / 0.0 |
+| Mean scammer turns to reach high | 2.15 |
 | Critical by first payment demand | 1.0 |
-| Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 438s |
-| Identifier types extracted per session (mean) | 7.6 |
+| Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 805s |
+| Identifier types extracted per session (mean) | 8.3 |
 | Persona leakage rate (guard violations per persona turn) | 0.0000 |
-| Memory benefit: turns saved on 2nd exposure (mean) | 1.14 |
-| Run mode | offline (rules + scripted fallbacks, no LLM) |
+| Memory benefit: turns saved on 2nd exposure (mean) | 1.43 |
+| Run mode | live (Nebius Token Factory + Nemotron) |
 <!-- EVAL:END -->
 
 Read the numbers honestly: the rules-only detector is weakest on paraphrase, and the *tuned* set is optimistic. One held-out false positive (a public scam-awareness advisory) was fixed after it was observed, so the held-out figures are post-fix. `make eval-live` measures the Nemotron-assisted pipeline once a key is configured.
