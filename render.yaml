@@ -1,0 +1,29 @@
+# Render Blueprint: backend API (Docker + persistent disk). Frontend goes on Vercel (see docs/DEPLOY.md).
+# Secrets are sync:false, so Render prompts for them in the dashboard; none live in this repo.
+services:
+  - type: web
+    name: scam-khel-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter # persistent disks are not available on the free plan
+    healthCheckPath: /healthz
+    disk:
+      name: scamkhel-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - { key: PORT, value: "8000" }
+      - { key: DEMO_MODE, value: "true" }
+      - { key: TRUSTED_PROXIES, value: "10.0.0.0/8" }
+      - { key: FRONTEND_ORIGIN, sync: false } # your Vercel URL, e.g. https://scam-khel.vercel.app
+      - { key: NEBIUS_API_KEY, sync: false }
+      - { key: NEBIUS_BASE_URL, sync: false }
+      - { key: MODEL_FAST, sync: false }
+      - { key: MODEL_MID, sync: false }
+      - { key: MODEL_DEEP, sync: false }
+      - { key: LLM_DISABLE_THINKING, value: "true" }
+      - { key: FERNET_KEY, sync: false }
+      - { key: ADMIN_TOKEN, generateValue: true }
+      - { key: TAVILY_API_KEY, sync: false }
+      - { key: TELEGRAM_BOT_TOKEN, sync: false }
