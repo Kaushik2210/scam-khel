@@ -1,18 +1,18 @@
 {
- "mode": "offline (rules + scripted fallbacks, no LLM)",
+ "mode": "live (Nebius Token Factory + Nemotron)",
  "detection": {
   "overall": {
    "n": 43,
    "scam": 26,
    "legit": 17,
    "tp": 26,
-   "fp": 0,
+   "fp": 2,
    "fn": 0,
-   "precision": 1.0,
+   "precision": 0.929,
    "recall": 1.0,
-   "f1": 1.0,
-   "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.27,
+   "f1": 0.963,
+   "fp_rate_legit": 0.118,
+   "mean_turns_to_detect": 2.15,
    "critical_by_payment_rate": 1.0
   },
   "tuned_set": {
@@ -20,13 +20,13 @@
    "scam": 14,
    "legit": 8,
    "tp": 14,
-   "fp": 0,
+   "fp": 2,
    "fn": 0,
-   "precision": 1.0,
+   "precision": 0.875,
    "recall": 1.0,
-   "f1": 1.0,
-   "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.21,
+   "f1": 0.933,
+   "fp_rate_legit": 0.25,
+   "mean_turns_to_detect": 2.14,
    "critical_by_payment_rate": 1.0
   },
   "held_out_set": {
@@ -40,7 +40,7 @@
    "recall": 1.0,
    "f1": 1.0,
    "fp_rate_legit": 0.0,
-   "mean_turns_to_detect": 2.33,
+   "mean_turns_to_detect": 2.17,
    "critical_by_payment_rate": 1.0
   },
   "by_language": {
@@ -49,13 +49,13 @@
     "scam": 13,
     "legit": 11,
     "tp": 13,
-    "fp": 0,
+    "fp": 1,
     "fn": 0,
-    "precision": 1.0,
+    "precision": 0.929,
     "recall": 1.0,
-    "f1": 1.0,
-    "fp_rate_legit": 0.0,
-    "mean_turns_to_detect": 2.46,
+    "f1": 0.963,
+    "fp_rate_legit": 0.091,
+    "mean_turns_to_detect": 2.31,
     "critical_by_payment_rate": 1.0
    },
    "hi": {
@@ -77,59 +77,80 @@
     "scam": 9,
     "legit": 5,
     "tp": 9,
-    "fp": 0,
+    "fp": 1,
     "fn": 0,
-    "precision": 1.0,
+    "precision": 0.9,
     "recall": 1.0,
-    "f1": 1.0,
-    "fp_rate_legit": 0.0,
-    "mean_turns_to_detect": 2.11,
+    "f1": 0.947,
+    "fp_rate_legit": 0.2,
+    "mean_turns_to_detect": 2,
     "critical_by_payment_rate": 1.0
    }
   },
-  "errors": []
+  "errors": [
+   {
+    "id": "legit-04-emi-reminder",
+    "set": "tuned",
+    "label": "legit",
+    "language": "en",
+    "peak": 74,
+    "pred_scam": true,
+    "turns_to_detect": 2,
+    "critical_by_payment": null
+   },
+   {
+    "id": "legit-05-family-chat-hinglish",
+    "set": "tuned",
+    "label": "legit",
+    "language": "hinglish",
+    "peak": 85,
+    "pred_scam": true,
+    "turns_to_detect": 2,
+    "critical_by_payment": null
+   }
+  ]
  },
  "honeypot": {
   "scenarios": [
    {
     "scenario": "adversarial-injection",
     "engaged_turns": 10,
-    "time_wasted_s": 437,
-    "identifier_types": 5,
-    "identifiers": 5,
+    "time_wasted_s": 777,
+    "identifier_types": 6,
+    "identifiers": 6,
     "leaks": 0,
-    "guard_rewrites": 0,
-    "injections": 5,
+    "guard_rewrites": 2,
+    "injections": 0,
     "ended": "scammer_disengaged"
    },
    {
     "scenario": "courier-drug-package",
     "engaged_turns": 11,
-    "time_wasted_s": 458,
-    "identifier_types": 8,
-    "identifiers": 8,
+    "time_wasted_s": 945,
+    "identifier_types": 9,
+    "identifiers": 15,
     "leaks": 0,
-    "guard_rewrites": 0,
+    "guard_rewrites": 1,
     "injections": 0,
     "ended": "scammer_disengaged"
    },
    {
     "scenario": "digital-arrest-money-laundering",
     "engaged_turns": 12,
-    "time_wasted_s": 525,
-    "identifier_types": 7,
-    "identifiers": 7,
+    "time_wasted_s": 947,
+    "identifier_types": 10,
+    "identifiers": 23,
     "leaks": 0,
-    "guard_rewrites": 0,
+    "guard_rewrites": 2,
     "injections": 0,
     "ended": "scammer_disengaged"
    },
    {
     "scenario": "digital-arrest-parcel",
     "engaged_turns": 12,
-    "time_wasted_s": 530,
+    "time_wasted_s": 918,
     "identifier_types": 8,
-    "identifiers": 8,
+    "identifiers": 18,
     "leaks": 0,
     "guard_rewrites": 0,
     "injections": 0,
@@ -138,9 +159,9 @@
    {
     "scenario": "fake-customs",
     "engaged_turns": 9,
-    "time_wasted_s": 404,
-    "identifier_types": 10,
-    "identifiers": 10,
+    "time_wasted_s": 575,
+    "identifier_types": 9,
+    "identifiers": 14,
     "leaks": 0,
     "guard_rewrites": 0,
     "injections": 0,
@@ -149,9 +170,9 @@
    {
     "scenario": "fake-police-family-accident",
     "engaged_turns": 9,
-    "time_wasted_s": 373,
-    "identifier_types": 8,
-    "identifiers": 8,
+    "time_wasted_s": 710,
+    "identifier_types": 10,
+    "identifiers": 13,
     "leaks": 0,
     "guard_rewrites": 0,
     "injections": 0,
@@ -160,9 +181,9 @@
    {
     "scenario": "kyc-expiry-bank",
     "engaged_turns": 8,
-    "time_wasted_s": 337,
-    "identifier_types": 7,
-    "identifiers": 7,
+    "time_wasted_s": 764,
+    "identifier_types": 6,
+    "identifiers": 9,
     "leaks": 0,
     "guard_rewrites": 0,
     "injections": 0,
@@ -171,46 +192,46 @@
   ],
   "sessions": 7,
   "mean_engaged_turns": 10.1,
-  "mean_time_wasted_s": 438,
-  "mean_identifier_types": 7.6,
-  "mean_identifiers": 7.6,
+  "mean_time_wasted_s": 805,
+  "mean_identifier_types": 8.3,
+  "mean_identifiers": 14,
   "persona_leakage_rate": 0.0,
-  "guard_rewrites_total": 0,
+  "guard_rewrites_total": 5,
   "memory": [
    {
     "scenario": "adversarial-injection",
-    "first_detect_turn": 2,
-    "second_detect_turn": 2,
-    "second_memory_hit_turn": 2,
+    "first_detect_turn": 1,
+    "second_detect_turn": 1,
+    "second_memory_hit_turn": null,
     "benefit": 0
    },
    {
     "scenario": "courier-drug-package",
-    "first_detect_turn": 4,
-    "second_detect_turn": 2,
-    "second_memory_hit_turn": 2,
-    "benefit": 2
+    "first_detect_turn": 2,
+    "second_detect_turn": 1,
+    "second_memory_hit_turn": 1,
+    "benefit": 1
    },
    {
     "scenario": "digital-arrest-money-laundering",
     "first_detect_turn": 4,
-    "second_detect_turn": 3,
-    "second_memory_hit_turn": 3,
-    "benefit": 1
+    "second_detect_turn": 2,
+    "second_memory_hit_turn": null,
+    "benefit": 2
    },
    {
     "scenario": "digital-arrest-parcel",
-    "first_detect_turn": 4,
-    "second_detect_turn": 2,
-    "second_memory_hit_turn": 2,
-    "benefit": 2
+    "first_detect_turn": 2,
+    "second_detect_turn": 1,
+    "second_memory_hit_turn": 1,
+    "benefit": 1
    },
    {
     "scenario": "fake-customs",
-    "first_detect_turn": 4,
+    "first_detect_turn": 3,
     "second_detect_turn": 2,
-    "second_memory_hit_turn": 2,
-    "benefit": 2
+    "second_memory_hit_turn": null,
+    "benefit": 1
    },
    {
     "scenario": "fake-police-family-accident",
@@ -221,42 +242,48 @@
    },
    {
     "scenario": "kyc-expiry-bank",
-    "first_detect_turn": 2,
-    "second_detect_turn": 2,
-    "second_memory_hit_turn": 2,
-    "benefit": 0
+    "first_detect_turn": 5,
+    "second_detect_turn": 1,
+    "second_memory_hit_turn": null,
+    "benefit": 4
    }
   ],
-  "memory_mean_turns_saved": 1.14
+  "memory_mean_turns_saved": 1.43
  },
  "usage": {
   "by_tier": {
    "fast": {
-    "calls": 0,
-    "prompt_tokens": 0,
-    "completion_tokens": 0,
-    "latency_p50_ms": null,
-    "latency_p95_ms": null,
-    "models": []
+    "calls": 293,
+    "prompt_tokens": 203356,
+    "completion_tokens": 37217,
+    "latency_p50_ms": 2263.7,
+    "latency_p95_ms": 5093.3,
+    "models": [
+     "nvidia/nemotron-3.5-bolt-e4b"
+    ]
    },
    "mid": {
-    "calls": 0,
-    "prompt_tokens": 0,
-    "completion_tokens": 0,
-    "latency_p50_ms": null,
-    "latency_p95_ms": null,
-    "models": []
+    "calls": 552,
+    "prompt_tokens": 400987,
+    "completion_tokens": 40914,
+    "latency_p50_ms": 1302.1,
+    "latency_p95_ms": 4611.2,
+    "models": [
+     "nvidia/nemotron-3.5-lightning-30b-a3b"
+    ]
    },
    "deep": {
-    "calls": 0,
-    "prompt_tokens": 0,
-    "completion_tokens": 0,
-    "latency_p50_ms": null,
-    "latency_p95_ms": null,
-    "models": []
+    "calls": 20,
+    "prompt_tokens": 40218,
+    "completion_tokens": 12169,
+    "latency_p50_ms": 20358.0,
+    "latency_p95_ms": 59577.6,
+    "models": [
+     "nvidia/nemotron-3-ultra-550b-a55b"
+    ]
    },
-   "total_tokens": 0
+   "total_tokens": 734861
   },
-  "note": "Offline run: no LLM calls, so no tokens or latency. Run `make eval-live` with a Token Factory key to fill this table."
+  "note": "Live run: 734861 tokens over ~64 analysed units."
  }
 }
