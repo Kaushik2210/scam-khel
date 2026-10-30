@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import ShaderHero from "@/components/ui/hero";
 import { useRequireConsent } from "@/components/Consent";
 import { useI18n, type Key } from "@/lib/i18n";
 import { TACTICS, lab } from "@/lib/labels";
@@ -63,19 +64,21 @@ export default function Home() {
   const trust = ["trust.private", "trust.encrypted", "trust.sim", "trust.draft"] as const;
   return (
     <div className="space-y-14">
-      <section className="grid items-center gap-8 pt-4 lg:grid-cols-[1.25fr_1fr]">
-        <div>
-          <h1 className="text-large md:text-[2.75rem] md:leading-[1.15]">{t("home.title")}</h1>
-          <p className="mt-4 max-w-2xl text-body text-label2">{t("home.sub")}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button type="button" className="btn-primary !min-h-[52px] !px-7" onClick={() => go("/live")} data-testid="cta-check">
+      <ShaderHero
+        title={t("home.title")}
+        sub={t("home.sub")}
+        actions={
+          <>
+            <button type="button" className="btn-primary !min-h-[52px] !rounded-full !px-7" onClick={() => go("/live")} data-testid="cta-check">
               <Icon name="shield" /> {t("home.cta.check")}
             </button>
-            <button type="button" className="btn-secondary !min-h-[52px] !px-7" onClick={() => go("/simulate")} data-testid="cta-sim">
+            <button type="button" className="btn-secondary !min-h-[52px] !rounded-full !px-7" onClick={() => go("/simulate")} data-testid="cta-sim">
               <Icon name="play" /> {t("home.cta.sim")}
             </button>
-          </div>
-          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-footnote text-label2">
+          </>
+        }
+        footer={
+          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-footnote text-white/80">
             {trust.map((k) => (
               <li key={k} className="flex items-center gap-1.5">
                 <span className="text-ok">
@@ -85,11 +88,9 @@ export default function Home() {
               </li>
             ))}
           </ul>
-        </div>
-        <div className="flex justify-center lg:justify-end">
-          <SampleCard />
-        </div>
-      </section>
+        }
+        aside={<SampleCard />}
+      />
 
       <section aria-label="Features" className="grid gap-4 md:grid-cols-2">
         {(
