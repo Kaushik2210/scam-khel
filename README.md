@@ -120,15 +120,15 @@ Measured by `make eval` (offline, deterministic), never hand-written. Full repor
 | Metric | Result |
 |---|---|
 | Eval set | 43 dialogues (26 scam / 17 legit; EN, Hindi, Hinglish) |
-| Precision / recall / F1 @ high (≥70), all | 0.929 / 1.0 / 0.963 |
+| Precision / recall / F1 @ high (≥70), all | 1.0 / 1.0 / 1.0 |
 | Same, held-out set only (21) | 1.0 / 1.0 / 1.0 |
-| False-positive rate on legit (all / held-out) | 0.118 / 0.0 |
+| False-positive rate on legit (all / held-out) | 0.0 / 0.0 |
 | Mean scammer turns to reach high | 2.15 |
 | Critical by first payment demand | 1.0 |
-| Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 805s |
-| Identifier types extracted per session (mean) | 8.3 |
+| Honeypot engaged turns / time wasted (mean, 7 scenarios) | 10.1 / 776s |
+| Identifier types extracted per session (mean) | 6.7 |
 | Persona leakage rate (guard violations per persona turn) | 0.0000 |
-| Memory benefit: turns saved on 2nd exposure (mean) | 1.43 |
+| Memory benefit: turns saved on 2nd exposure (mean) | 0.71 |
 | Run mode | live (Nebius Token Factory + Nemotron) |
 <!-- EVAL:END -->
 
