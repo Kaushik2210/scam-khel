@@ -47,7 +47,7 @@ export function LanguageToggle() {
 function EmergencyBar() {
   const { t } = useI18n();
   return (
-    <div className="bg-crit text-white" role="region" aria-label={t("emergency.text")}>
+    <div className="bg-[var(--crit-fill)] text-white" role="region" aria-label={t("emergency.text")}>
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 py-2 text-callout">
         <span className="font-semibold">{t("emergency.text")}</span>
         <a href="tel:1930" className="inline-flex min-h-[32px] items-center rounded-full bg-white px-4 font-bold text-[#b3001b] underline-offset-2 hover:underline">

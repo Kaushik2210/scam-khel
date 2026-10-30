@@ -44,16 +44,16 @@ test("shield: pasted legit text stays low; delete-all works", async ({ page }) =
   await expect(page.getByText(/all your data was deleted/i)).toBeVisible();
 });
 
-test("theme: light by default, switch to dark and it persists", async ({ page }) => {
+test("theme: dark by default, switch to light and it persists", async ({ page }) => {
   await page.goto("/");
   const html = page.locator("html");
-  await expect(html).toHaveAttribute("data-theme", "light");
-  await page.getByTestId("theme-dark").click();
-  await expect(html).toHaveAttribute("data-theme", "dark");
-  await page.reload();
   await expect(html).toHaveAttribute("data-theme", "dark");
   await page.getByTestId("theme-light").click();
   await expect(html).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await page.getByTestId("theme-dark").click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
 });
 
 test("report assistant: copy-ready fields, official portal link, never submits", async ({ page }) => {

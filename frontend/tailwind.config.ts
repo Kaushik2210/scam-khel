@@ -15,6 +15,7 @@ const config: Config = {
         label3: v("label-3"),
         sep: v("separator"),
         tint: v("tint"),
+        accent: v("accent"),
         "tint-on": v("tint-on"),
         ok: v("ok"),
         warn: v("warn"),
@@ -26,7 +27,8 @@ const config: Config = {
         "crit-bg": v("crit-bg"),
       },
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "system-ui", "Segoe UI", "Noto Sans Devanagari", "Roboto", "sans-serif"],
+        sans: ["var(--font-body)", "Noto Sans Devanagari", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-body)", "system-ui", "sans-serif"],
         mono: ["ui-monospace", "SF Mono", "Menlo", "Consolas", "monospace"],
       },
       // Apple text styles in rem (Dynamic Type equivalent: scales with the user's font-size setting)

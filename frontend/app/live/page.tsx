@@ -153,7 +153,7 @@ export default function Live() {
       {state.status === "error" && <Notice tone="error">{t("state.error")}</Notice>}
       {state.risk && <Verdict level={state.risk.level} summary={state.risk.summary} />}
       {tab === "listen" && high && (
-        <div className="rounded-card bg-crit p-4 text-center text-title2 text-white" role="alert">
+        <div className="rounded-card bg-[var(--crit-fill)] p-4 text-center text-title2 text-white" role="alert">
           {t("listen.alert")}
         </div>
       )}

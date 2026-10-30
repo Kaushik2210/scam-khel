@@ -6,16 +6,16 @@ export type Theme = "light" | "dark" | "system";
 const KEY = "sk_theme";
 
 /** Runs before first paint (inlined in layout.tsx) so the page never flashes the wrong theme. */
-export const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("${KEY}");if(t!=="light"&&t!=="dark"&&t!=="system"){t="light"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}})();`;
+export const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("${KEY}");if(t!=="light"&&t!=="dark"&&t!=="system"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();`;
 
 interface Ctx {
   theme: Theme;
   setTheme: (t: Theme) => void;
 }
-const ThemeCtx = createContext<Ctx>({ theme: "light", setTheme: () => {} });
+const ThemeCtx = createContext<Ctx>({ theme: "dark", setTheme: () => {} });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<Theme>("dark");
   useEffect(() => {
     const cur = document.documentElement.getAttribute("data-theme");
     if (cur === "light" || cur === "dark" || cur === "system") setThemeState(cur);
