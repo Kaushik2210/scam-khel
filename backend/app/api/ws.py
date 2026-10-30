@@ -5,12 +5,13 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import json
+import secrets
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.api.helpers import flush_usage, make_alert_hook
-from app.api.state import AppState, LiveSession, user_for_client
+from app.api.state import AppState, LiveSession
 from app.guards.demo_mode import first_replay, load_replay
 from app.logging import get_logger
 from app.memory.models import User
@@ -74,7 +75,7 @@ async def _run_replay(ch: Channel, scenario: str) -> None:
 
 
 @router.websocket("/ws/sessions/{sid}")
-async def session_ws(ws: WebSocket, sid: str, client_id: str = "") -> None:
+async def session_ws(ws: WebSocket, sid: str, ticket: str = "") -> None:
     st: AppState = ws.app.state.s
     origin = ws.headers.get("origin")
     if (
@@ -85,13 +86,13 @@ async def session_ws(ws: WebSocket, sid: str, client_id: str = "") -> None:
         await ws.close(code=4403)
         return
     live = st.live.get(sid)
+    # The URL carries a per-session ticket, never the long-lived client ID.
+    if live is None or not _ticket_ok(ticket, live.ticket):
+        await ws.close(code=4404)
+        return
     async with st.sm() as db:
-        try:
-            user: User = await user_for_client(db, client_id)
-        except Exception:
-            await ws.close(code=4401)
-            return
-    if live is None or live.user_id != user.id:
+        user = await db.get(User, live.user_id)
+    if user is None:
         await ws.close(code=4404)
         return
     await ws.accept()
@@ -131,6 +132,12 @@ async def session_ws(ws: WebSocket, sid: str, client_id: str = "") -> None:
         await flush_usage(st)
         with contextlib.suppress(Exception):
             await ws.close()
+
+
+def _ticket_ok(given: str, expected: str) -> bool:
+    if not given or not expected:
+        return False
+    return secrets.compare_digest(given.encode("utf-8"), expected.encode("utf-8"))
 
 
 async def _recv(ws: WebSocket) -> dict[str, Any] | None:

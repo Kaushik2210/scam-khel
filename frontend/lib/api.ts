@@ -18,11 +18,15 @@ function safeSet(k: string, v: string) {
   }
 }
 
+const ALLOW_CLIENT_PARAM = process.env.NEXT_PUBLIC_ALLOW_CLIENT_PARAM === "1";
+
 let memoryId: string | null = null;
 export function clientId(): string {
   if (typeof window === "undefined") return "ssr-placeholder";
-  // ?client=<id> lets the demo script open the app as the seeded demo user
-  const fromUrl = new URLSearchParams(window.location.search).get("client");
+  // ?client=<id> opens the app as the seeded demo user. It is OFF unless the build sets
+  // NEXT_PUBLIC_ALLOW_CLIENT_PARAM=1: the client id is the only credential, so a link that
+  // chose it for a visitor would let whoever sent the link read that visitor's data.
+  const fromUrl = ALLOW_CLIENT_PARAM ? new URLSearchParams(window.location.search).get("client") : null;
   if (fromUrl && /^[A-Za-z0-9-]{8,64}$/.test(fromUrl)) {
     safeSet(CID_KEY, fromUrl);
     memoryId = fromUrl;
@@ -82,8 +86,13 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (await res.json()) as T;
 }
 
-export function wsUrl(path: string): string {
-  return `${API.replace(/^http/, "ws")}${path}${path.includes("?") ? "&" : "?"}client_id=${clientId()}`;
+/**
+ * Websocket URL for a session. It carries the per-session ticket the API returned when the
+ * session was created, never the long-lived client id, so the credential stays out of URLs
+ * and the access logs that record them.
+ */
+export function wsUrl(path: string, ticket: string): string {
+  return `${API.replace(/^http/, "ws")}${path}${path.includes("?") ? "&" : "?"}ticket=${encodeURIComponent(ticket)}`;
 }
 
 /** Download an authenticated file (the client id header can't ride on a plain <a href>). */

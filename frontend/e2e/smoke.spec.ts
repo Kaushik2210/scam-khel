@@ -126,3 +126,15 @@ test("landing → consent → simulation → risk climbs → complaint PDF", asy
   await page2.goto("/incidents");
   await expect(page2.getByText("digital-arrest-parcel").first()).toBeVisible();
 });
+
+test("?client=<id> in the URL cannot choose the visitor's identity", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("sk_consent_v1", "granted"));
+  await page.goto("/parent?client=attacker-chosen-id-1");
+  await page.getByTestId("parent-text").fill("You are under digital arrest. Transfer money now.");
+  await page.getByRole("button", { name: /^check$/i }).click();
+  // the check goes through the API, which reads the identity, so it must exist by now
+  await expect(page.getByTestId("parent-verdict")).toBeVisible();
+  const id = await page.evaluate(() => window.localStorage.getItem("sk_client_id"));
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  expect(id).not.toBe("attacker-chosen-id-1");
+});

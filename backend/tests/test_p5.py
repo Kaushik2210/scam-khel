@@ -6,7 +6,13 @@ from sqlalchemy import select
 
 from app.actions.alerts import MAX_ALERTS_PER_HOUR, AlertService, format_alert
 from app.actions.panic import TransactionDetails, panic_bundle
-from app.actions.telegram import TelegramClient, TelegramError, handle_update
+from app.actions.telegram import (
+    MAX_BAD_CODES,
+    TelegramClient,
+    TelegramError,
+    handle_update,
+)
+from app.guards.ratelimit import RateLimiter
 from app.memory import repo
 from app.memory.db import init_db, make_engine, make_sessionmaker
 from app.memory.models import AlertLog
@@ -70,6 +76,60 @@ async def test_start_code_links_chat(db):
         == "missing_code"
     )
     assert await handle_update({"message": {"text": "hello", "chat": {"id": 5}}}, db, tg) is None
+
+
+async def test_join_codes_are_long_unambiguous_and_unique(db):
+    _, members = await family(db, n=6)
+    codes = [m.join_code for m in members]
+    assert len(set(codes)) == len(codes)
+    for c in codes:
+        assert len(c) == repo.JOIN_CODE_LENGTH == 10
+        assert set(c) <= set(repo.JOIN_CODE_ALPHABET)
+        assert not set(c) & set("01ILOilo")
+
+
+async def test_code_is_case_insensitive_and_legacy_lowercase_codes_still_work(db):
+    bot = Bot()
+    _, (m, m2) = await family(db)
+    tg = bot.client()
+
+    def upd(code, chat):
+        return {"message": {"text": f"/start {code}", "chat": {"id": chat}}}
+
+    assert await handle_update(upd(m.join_code.lower(), 21), db, tg) == "linked"
+    m2.join_code = "a1b2c3d4"  # an 8-char lowercase hex code issued before this change
+    await db.commit()
+    assert await handle_update(upd("A1B2C3D4", 22), db, tg) == "linked"
+
+
+async def test_linked_slot_cannot_be_taken_over_with_the_same_code(db):
+    bot = Bot()
+    _, (m, _) = await family(db)
+    assert await join(db, bot, m, 111) == "linked"
+    assert await join(db, bot, m, 222) == "already_linked"
+    await db.refresh(m)
+    assert m.telegram_chat_id == "111"
+    assert "already in use" in bot.sent[-1][1]["text"]
+    assert bot.sent[-1][1]["chat_id"] == "222"
+    assert await join(db, bot, m, 111) == "linked"  # the same chat repeating /start is fine
+
+
+async def test_wrong_codes_lock_a_chat_out_even_for_the_right_code(db):
+    bot = Bot()
+    limiter = RateLimiter()
+    _, (m, _) = await family(db)
+    tg = bot.client()
+
+    def upd(code, chat):
+        return {"message": {"text": f"/start {code}", "chat": {"id": chat}}}
+
+    for _ in range(MAX_BAD_CODES):
+        assert await handle_update(upd("WRONGCODE1", 9), db, tg, limiter) == "unknown_code"
+    assert await handle_update(upd(m.join_code, 9), db, tg, limiter) == "rate_limited"
+    await db.refresh(m)
+    assert m.telegram_chat_id is None
+    # another chat is unaffected
+    assert await handle_update(upd(m.join_code, 10), db, tg, limiter) == "linked"
 
 
 async def test_alert_content_dedupe_and_critical_escalation(db):

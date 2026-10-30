@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -139,17 +140,33 @@ async def delete_user_data(db: AsyncSession, user_id: int) -> None:
     await db.commit()
 
 
+# Unambiguous letters and digits (no 0/O, 1/I/L): codes are typed into Telegram by hand.
+JOIN_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+JOIN_CODE_LENGTH = 10  # about 49 bits
+
+
+def new_join_code() -> str:
+    return "".join(secrets.choice(JOIN_CODE_ALPHABET) for _ in range(JOIN_CODE_LENGTH))
+
+
 async def add_family_member(
     db: AsyncSession, user_id: int, label: str, role: str = "family"
 ) -> FamilyMember:
-    import secrets
-
-    m = FamilyMember(
-        user_id=user_id, label=label[:32], role=role[:32], join_code=secrets.token_hex(4)
-    )
+    m = FamilyMember(user_id=user_id, label=label[:32], role=role[:32], join_code=new_join_code())
     db.add(m)
     await db.commit()
     return m
+
+
+async def delete_family_member(db: AsyncSession, user_id: int, member_id: int) -> bool:
+    m = await db.scalar(
+        select(FamilyMember).where(FamilyMember.id == member_id, FamilyMember.user_id == user_id)
+    )
+    if m is None:
+        return False
+    await db.delete(m)
+    await db.commit()
+    return True
 
 
 async def list_family(db: AsyncSession, user_id: int) -> list[FamilyMember]:
